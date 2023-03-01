@@ -1,10 +1,15 @@
-import {View, Text, TouchableHighlight,StyleSheet,Dimensions} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableHighlight,
+  StyleSheet,
+  Dimensions,
+} from 'react-native';
 import React, {useState} from 'react';
 
 import {Dropdown} from 'react-native-element-dropdown';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation} from '@react-navigation/native';
-
 
 const Airport = () => {
   const navigation = useNavigation();
@@ -12,10 +17,9 @@ const Airport = () => {
   const [airportName, setAirportName] = useState('');
 
   const [terminal, setTerminal] = useState('');
-const [airportValue,setAirportValue] =useState(null)
-const[terminalValue,setTerminalValue] =useState(null)
 
-  const [selectedDropdown, setSelectedDropdown] = useState(false);
+  const [airportValue, setAirportValue] = useState('');
+  const [terminalValue, setTerminalValue] = useState(null);
 
   const Terminal_data = [
     {label: 'MOPA TERMINAL', value: '1'},
@@ -27,7 +31,6 @@ const[terminalValue,setTerminalValue] =useState(null)
     {label: 'MOPA AIRPORT', value: '1'},
     {label: 'HYDERABAD AIRPORT', value: '2'},
   ];
-
 
   const renderItem = item => {
     return (
@@ -42,67 +45,73 @@ const[terminalValue,setTerminalValue] =useState(null)
 
       <Text style={styles.subtitle}>Airport Name</Text>
       <Dropdown
-          style={styles.dropdown}
-          placeholderStyle={styles.placeholderStyle}
-          selectedTextStyle={styles.selectedTextStyle}
-          inputSearchStyle={styles.inputSearchStyle}
-          iconStyle={styles.iconStyle}
-          data={Airport_name}
-          maxHeight={300}
-          labelField="label"
-          valueField="value"
-          placeholder="Select Airport "
-          searchPlaceholder="Search..."
-          value={airportName}
-          onChange={item => {
-            setAirportName(item.value);
-          }}
-          renderItem={renderItem}
-        />
-     
+        style={styles.dropdown}
+        placeholderStyle={styles.placeholderStyle}
+        selectedTextStyle={styles.selectedTextStyle}
+        inputSearchStyle={styles.inputSearchStyle}
+        iconStyle={styles.iconStyle}
+        data={Airport_name}
+        maxHeight={300}
+        labelField="label"
+        valueField="value"
+        placeholder="Select Airport "
+        searchPlaceholder="Search..."
+        value={airportName}
+        onChange={item => {
+          setAirportName(item.value);
+          setAirportValue(item.label);
+        }}
+        renderItem={renderItem}
+      />
+
       <Text style={styles.subtitle}>Terminal</Text>
       <Dropdown
-          style={styles.dropdown}
-          placeholderStyle={styles.placeholderStyle}
-          selectedTextStyle={styles.selectedTextStyle}
-          inputSearchStyle={styles.inputSearchStyle}
-          iconStyle={styles.iconStyle}
-          data={Terminal_data}
-          maxHeight={300}
-          labelField="label"
-          valueField="value"
-          placeholder="Select Terminals"
-          searchPlaceholder="Search..."
-          value={terminalValue}
-          onChange={item => {
-            setTerminalValue(item.value);
-          }}
-          renderItem={renderItem}
-        />
-     
-    
+        disable={airportValue === '' ? true : false}
+        style={{
+          ...styles.dropdown,
+          backgroundColor: airportValue === '' ? 'grey' : '#EA8B5B',
+        }}
+        placeholderStyle={styles.placeholderStyle}
+        selectedTextStyle={styles.selectedTextStyle}
+        inputSearchStyle={styles.inputSearchStyle}
+        iconStyle={styles.iconStyle}
+        data={Terminal_data}
+        maxHeight={300}
+        labelField="label"
+        valueField="value"
+        placeholder="Select Terminals"
+        searchPlaceholder="Search..."
+        value={terminalValue}
+        onChange={item => {
+          setTerminalValue(item.value);
+          setTerminal(item.label);
+        }}
+        renderItem={renderItem}
+      />
 
-      <Text style={{marginTop: 80}}>
-        <View>
-          <TouchableHighlight
-          onPress={() => navigation.navigate('Area')}
-            style={
-            styles.submitButton
-            }>
-            <Text 
-             style={styles.buttonText}>
-           Next
-            </Text>
-          </TouchableHighlight>
-        </View>
-      </Text>
+      <View style={{alignItems: 'center', marginVertical: 100}}>
+        <TouchableHighlight
+          disabled={terminal != '' ? false : true}
+          onPress={() =>
+            navigation.navigate('Area', {
+              terminal,
+              airportValue,
+            })
+          }
+          style={{
+            ...styles.submitButton,
+            backgroundColor: terminal != '' ? '#EA8B5B' : 'grey',
+          }}>
+          <Text style={styles.buttonText}>Next</Text>
+        </TouchableHighlight>
+      </View>
     </View>
   );
 };
 
 export default Airport;
 
-const styles=StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fdf4e0',
@@ -111,21 +120,21 @@ const styles=StyleSheet.create({
     paddingBottom: Dimensions.get('window').height * 0.1,
     paddingLeft: Dimensions.get('window').width * 0.1,
     paddingRight: Dimensions.get('window').width * 0.1,
-},
-title: {
-  fontSize: 22,
-  fontWeight: '500',
-  color: '#000',
-  marginBottom:20,
-  textAlign: 'center',
-},
-subtitle: {
-  fontSize: 18,
-  fontWeight: '500',
-  color: '#000',
-  marginTop: 20,
-  marginBottom: 10,
-},
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: '500',
+    color: '#000',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 18,
+    fontWeight: '500',
+    color: '#000',
+    marginTop: 20,
+    marginBottom: 10,
+  },
   dropdown: {
     marginLeft: 5,
     width: Dimensions.get('window').width * 0.8,
@@ -175,16 +184,17 @@ subtitle: {
   },
   submitButton: {
     backgroundColor: '#EA8B5B',
-    width: Dimensions.get('window').width * 0.8,
+    width: Dimensions.get('window').width * 0.5,
     padding: 10,
     borderRadius: 5,
     marginTop: 20,
     marginBottom: 20,
+    marginHorizontal: 20,
   },
-buttonText: {
-  color: '#fff',
-  fontSize: 16,
-  fontWeight: '400',
-  textAlign: 'center',
-},
-})
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '400',
+    textAlign: 'center',
+  },
+});

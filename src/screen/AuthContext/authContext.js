@@ -9,11 +9,14 @@ export const AuthProvider = ({children}) => {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(false);
 
+
+  
   const login = async user => {
     console.log(user);
     let config = {
       method: 'post',
       url: endPoints.auth.login,
+      // url:'http://10.0.2.2:5005/api/v1/auth/login',
       headers: {
         'Content-Type': 'application/json',
       },

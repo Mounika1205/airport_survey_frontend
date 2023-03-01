@@ -79,12 +79,6 @@ const RootNavigation = () => {
           />
 
           <Stack.Screen
-            name="CountSec"
-            component={CountSec}
-            options={{headerShown: false}}
-          />
-
-          <Stack.Screen
             name="IMMIGRATION"
             component={Immigration}
             options={{headerShown: false}}

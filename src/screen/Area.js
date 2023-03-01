@@ -1,9 +1,21 @@
 import { View, Text,TouchableHighlight,StyleSheet,Dimensions } from 'react-native'
 import React from 'react'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation,useRoute } from '@react-navigation/native'
+import { AuthContext } from './AuthContext/authContext';
 
 const Area = () => {
- 
+  const route =useRoute();
+
+
+  
+  
+    const  terminal =route.params.terminal
+    const  airportName= route.params.airportValue
+
+    console.log(terminal,airportName,"iam params")
+
+
+    
     const navigation=useNavigation();
 
     const Area = [
@@ -49,6 +61,9 @@ const Area = () => {
           },
         
       ];
+
+  const selected_area =() => {
+    setAreaName  }
       
   return (
     <View style={style.contain}>
@@ -62,7 +77,11 @@ const Area = () => {
     Area.map(area => (
             <TouchableHighlight key={area.id}
                 style={style.area_button}
-                onPress={() => navigation.navigate(`${area.name}`)} >
+                onPress={() => {
+                  let areaName=area.name
+                  navigation.navigate(`${area.name}`,{terminal,airportName,areaName})
+
+                }} >
                 <Text style={style.buttonText}>{area.name}</Text>
                
            

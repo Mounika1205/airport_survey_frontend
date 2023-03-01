@@ -1,24 +1,38 @@
-import { View, Text,StyleSheet,Dimensions,TouchableOpacity,ScrollView} from 'react-native'
-import React from 'react'
-import {Dropdown} from 'react-native-element-dropdown';
+import {
+  View,
+  Text,
+  Button,
+  TouchableOpacity,
+  Dimensions,
+  StyleSheet,
+  ScrollView,
+  Alert,
+} from 'react-native';
+import React, {useContext, useEffect, useState} from 'react';
 import ResetIcon from 'react-native-vector-icons/AntDesign';
-import { useState,useEffect } from 'react';
-import PlayIcon from 'react-native-vector-icons/AntDesign';
+import PlayIcon from 'react-native-vector-icons/Ionicons';
 import StopIcon from 'react-native-vector-icons/Ionicons';
-import { useNavigation } from '@react-navigation/native';
+import {Dropdown} from 'react-native-element-dropdown';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import {AuthContext} from './AuthContext/authContext';
+import {postQueueData} from '../apis/apis.services';
 
 const Parking = () => {
+  const navigation = useNavigation();
 
-  const navigation=useNavigation();
+  const route = useRoute();
 
-  const [type, SetType] = useState(null);
+  const {token} = useContext(AuthContext);
 
+  const airportValue = route.params.airportName;
+  const terminal = route.params.terminal;
+
+  const [type, setType] = useState('');
+  const [typeName, setTypeName] = useState('');
   const Type = [
     {label: 'Arrival', value: '1'},
     {label: 'Departure', value: '2'},
-
   ];
-
   const [time, setTime] = useState({
     firstTimer: '00:00:00',
     secondTimer: '00:00:00',
@@ -35,7 +49,6 @@ const Parking = () => {
   });
 
   const [beforeStart, setBeforeStart] = useState({
-
     firstTimer: '00:00:00',
     secondTimer: '00:00:00',
     thirdTimer: '00:00:00',
@@ -43,8 +56,72 @@ const Parking = () => {
     fifthTimer: '00:00:00',
   });
 
-
   const [selectedTimer, setSelectedTimer] = useState('');
+
+  const [counter, SetCounter] = useState('');
+
+  const [mannedValue, setMannedValue] = useState('');
+
+  const [millisec, setMilliSec] = useState({
+    firstTimer: '00:00:00.0',
+    secondTimer: '00:00:00.0',
+    thirdTimer: '00:00:00.0',
+    fourthTimer: '00:00:00.0',
+    fifthTimer: '00:00:00.0',
+  });
+
+  const [validation, setValidation] = useState({
+    timer: false,
+    firstPassenger: false,
+    secondPassenger: false,
+    thirdPassenger: false,
+    fourthPassenger: false,
+    fifthPassenger: false,
+  });
+
+  const [resetValidation, setResetValidation] = useState({
+    firstReset: false,
+    secondReset: false,
+    thirdReset: false,
+    fourthReset: false,
+    fifthReset: false,
+  });
+
+  const [timeRecorded, setTimeRecorded] = useState({
+    passenger1: {
+      start_time: '00:00:00',
+      end_time: '00:00:00.0',
+    },
+    passenger2: {
+      start_time: '00.00.00',
+      end_time: '00:00:00.0',
+    },
+    passenger3: {
+      start_time: '00.00.00',
+      end_time: '00:00:00.0',
+    },
+    passenger4: {
+      start_time: '00.00.00',
+      end_time: '00:00:00.0',
+    },
+    passenger5: {
+      start_time: '00.00.00',
+      end_time: '00:00:00.0',
+    },
+  });
+
+  const Counters = [
+    {label: '1', value: '1'},
+    {label: '2', value: '2'},
+    {label: '3', value: '3'},
+    {label: '4', value: '4'},
+    {label: '5', value: '5'},
+    {label: '6', value: '6'},
+    {label: '7', value: '7'},
+    {label: '8', value: '8'},
+    {label: '9', value: '9'},
+    {label: '10', value: '10'},
+  ];
 
   const renderItem = item => {
     return (
@@ -59,17 +136,54 @@ const Parking = () => {
 
     if (running[selectedTimer]) {
       interval = setInterval(() => {
-        const presentTime = new Date().toLocaleTimeString();
+        const presentTime = new Date().toLocaleTimeString('en-US', {
+          hour12: false,
+        });
         console.log(presentTime, 'iam present time');
         setTime({
           ...time,
           [selectedTimer]: presentTime,
         });
+        const currentTime =
+          new Date().toLocaleTimeString() + `.${new Date().getMilliseconds()}`;
+        console.log(currentTime, 'iam current time');
+        setMilliSec(prevState => ({
+          ...millisec,
+          [selectedTimer]: currentTime,
+        }));
       }, 1000);
       console.log(time, 'gjadg');
     } else if (!running[selectedTimer]) {
       console.log('iammmmmmmmmmmmmmm');
       clearInterval(interval);
+      setTimeRecorded(prevState => ({
+        ...prevState,
+        passenger1: {
+          ...prevState.passenger1,
+          start_time: beforeStart.firstTimer,
+          end_time: millisec.firstTimer,
+        },
+        passenger2: {
+          ...prevState.passenger2,
+          start_time: beforeStart.secondTimer,
+          end_time: millisec.secondTimer,
+        },
+        passenger3: {
+          ...prevState.passenger3,
+          start_time: beforeStart.thirdTimer,
+          end_time: millisec.thirdTimer,
+        },
+        passenger4: {
+          ...prevState.passenger4,
+          start_time: beforeStart.fourthTimer,
+          end_time: millisec.fourthTimer,
+        },
+        passenger5: {
+          ...prevState.passenger5,
+          start_time: beforeStart.fifthTimer,
+          end_time: millisec.fifthTimer,
+        },
+      }));
     }
 
     return () => {
@@ -82,39 +196,110 @@ const Parking = () => {
     running.fourthTimer,
     running.fifthTimer,
   ]);
-  
-  return (
+  console.log(time, 'iam time obj');
+  console.log(beforeStart);
+
+  const handleSubmit = async () => {
+
+    if(validation.fifthPassenger &&
+      type != '' &&
+      !resetValidation.firstReset &&
+      !resetValidation.secondReset &&
+      !resetValidation.thirdReset &&
+      !resetValidation.fourthReset &&
+      !resetValidation.fifthReset){
+
+        
+    const final = {
+      airport_name: route.params.airportName,
+      terminal: route.params.terminal,
+      area: route.params.areaName,
+      meta_data: {
+        Type: typeName,
+      },
+      time_recorded: timeRecorded,
+    };
+    console.log(final, 'iam api object');
+
+        const result = await postQueueData(token, final);
+
+    if (result.status === 200) {
+      Alert.alert(
+        'Success',
+        'Data is created Successfully',
+        [
+          {
+            text: 'OK',
+            onPress: () => navigation.navigate('Airport'),
+          },
+          console.log(terminal, airportValue),
+        ],
+        {cancelable: false},
+      );
+    } else {
+      Alert.alert(
+        'Error',
+        'Data is not created Successfully',
+        [
+          {
+            text: 'OK',
+            onPress: () => navigation.navigate('PARKING'),
+          },
+        ],
+        {cancelable: false},
+      );
+    }
+
+      } else {
+
+        Alert.alert('Please Fill or Enter all the details')
+      }
+
  
- <View style={styles.contain}>
-  <Text style={styles.title}>
-    PARKING
-  </Text>
-<View style={{display:'flex',flexDirection:'row',justifyContent:'space-evenly'}}>
-<Text>
-<Dropdown
-          style={styles.dropdown}
-          placeholderStyle={styles.placeholderStyle}
-          selectedTextStyle={styles.selectedTextStyle}
-          inputSearchStyle={styles.inputSearchStyle}
-          iconStyle={styles.iconStyle}
-          data={Type}
-          maxHeight={300}
-          labelField="label"
-          valueField="value"
-          placeholder="Type"
-          searchPlaceholder="Search..."
-          value={type}
-          onChange={item => {
-            SetType(item.value);
-          }}
-          renderItem={renderItem}
-        />
-</Text>
-  <View>
+  };
+
+  const backButton = () => {
+    navigation.navigate('Area', {
+      airportValue,
+      terminal,
+    });
+  };
+  return (
+    <View style={styles.contain}>
+      <Text style={styles.title}>PARKING</Text>
+
+      <View
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-evenly',
+          alignItems: 'center',
+        }}>
+        <Text>
+          <Dropdown
+            style={styles.dropdown}
+            placeholderStyle={styles.placeholderStyle}
+            selectedTextStyle={styles.selectedTextStyle}
+            inputSearchStyle={styles.inputSearchStyle}
+            iconStyle={styles.iconStyle}
+            data={Type}
+            maxHeight={300}
+            labelField="label"
+            valueField="value"
+            placeholder="Select Type"
+            searchPlaceholder="Search..."
+            value={type}
+            onChange={item => {
+              setType(item.value);
+              setTypeName(item.label);
+            }}
+            renderItem={renderItem}
+          />
+        </Text>
+        <View>
           <TouchableOpacity
             onPress={() => {
-
-              SetType(null);
+              setType('');
             }}>
             <View>
               <Text style={{marginTop: 10}}>
@@ -123,616 +308,766 @@ const Parking = () => {
             </View>
           </TouchableOpacity>
         </View>
-
-</View>
-
-<ScrollView>
-      <View>
-        <View style={styles.section}>
-          <View>
-            <Text
-              style={{
-                color: 'black',
-                fontSize: 20,
-                textAlign: 'center',
-
-              }}>
-              Passenger 1
-            </Text>
-          </View>
-
-          <View>
-            <TouchableOpacity
-              onPress={() => {
-                setTime({
-                  ...time,
-                  firstTimer: '00:00:00',
-                });
-                setBeforeStart({
-                  ...beforeStart,
-                  firstTimer: '00:00:00',
-                });
-                setRunning({
-                    ...running,
-                    firstTimer: false,
-                  });
-              }}>
-              <View>
-                <Text style={{}}>
-                  <ResetIcon name="retweet" size={25} color="#000" style={{}} />
-                </Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-around',
-            marginTop: 10,
-            marginHorizontal: 30,
-            backgroundColor: '#EA8B5B',
-            marginTop: 8,
-            width: Dimensions.get('window').width * 0.8,
-            height: Dimensions.get('window').height * 0.08,
-            borderRadius: 5,
-            alignItems: 'center',
-          }}>
-          <View
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}>
-            <Text>
-              <TouchableOpacity
-                onPress={() => {
-                  setSelectedTimer('firstTimer');
-                  let date = new Date();
-                  const presentTime = date.toLocaleTimeString();
-                  setBeforeStart(prevState => ({
-                    ...prevState,
-                    firstTimer: presentTime,
-                  }));
-                  setRunning(prevState => ({
-                    ...prevState,
-                    firstTimer: true,
-                  }));
+      </View>
+      <ScrollView>
+        <View>
+          <View style={styles.section}>
+            <View>
+              <Text
+                style={{
+                  color: 'black',
+                  fontSize: 20,
+                  textAlign: 'center',
                 }}>
-                <PlayIcon
-                  name="playcircleo"
-                  size={28}
-                  color="#fff"
-                  style={{marginTop: 4}}
-                />
-              </TouchableOpacity>{' '}
-            </Text>
+                Passenger 1
+              </Text>
+            </View>
 
-            <Text style={{fontSize: 20, color: '#fff', marginTop: 5}}>
-              {' '}
-              {beforeStart.firstTimer}
-            </Text>
-          </View>
-          <View
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}>
-            <Text style={{}}>
+            <View>
               <TouchableOpacity
                 onPress={() => {
+                  setResetValidation({
+                    ...resetValidation,
+                    firstReset: true,
+                  });
+                  setTime({
+                    ...time,
+                    firstTimer: '00:00:00',
+                  });
+                  setBeforeStart({
+                    ...beforeStart,
+                    firstTimer: '00:00:00',
+                  });
                   setRunning({
                     ...running,
                     firstTimer: false,
                   });
-                }}>
-                <StopIcon
-                  name="stop-circle-outline"
-                  size={32}
-                  color="#ffff"
-                  style={{}}
-                />
-              </TouchableOpacity>{' '}
-            </Text>
-            <Text style={{fontSize: 20, marginTop: 5, color: '#fff'}}>
-              {' '}
-              {time.firstTimer}
-            </Text>
-          </View>
-        </View>
-      </View>
-
-      <View>
-        <View style={styles.section}>
-          <View>
-            <Text
-              style={{
-                color: 'black',
-                fontSize: 20,
-                textAlign: 'center',
-              }}>
-              Passenger 2
-            </Text>
-          </View>
-
-          <View>
-            <TouchableOpacity
-              onPress={() => {
-                setTime({
-                  ...time,
-                  secondTimer: '00:00:00',
-                });
-                setBeforeStart({
-                  ...beforeStart,
-                  secondTimer: '00:00:00',
-                });
-                setRunning({
-                    ...running,
-                    secondTimer: false,
+                  setValidation({
+                    ...validation,
+                    firstPassenger: false,
+                    timer: false,
                   });
-              }}>
-              <View>
-                <Text style={{}}>
-                  <ResetIcon name="retweet" size={25} color="#000" style={{}} />
-                </Text>
-              </View>
-            </TouchableOpacity>
+                  setTimeRecorded(prevState => ({
+                    ...prevState,
+                    passenger1: {
+                      ...prevState.passenger1,
+                      start_time: '00:00:00',
+                      end_time: '00.00.00.0',
+                    },
+                  }));
+                  setMilliSec({
+                    ...millisec,
+                    firstTimer: '00:00:00.0',
+                  });
+                }}>
+                <View>
+                  <Text style={{}}>
+                    <ResetIcon
+                      name="retweet"
+                      size={25}
+                      color="#000"
+                      style={{}}
+                    />
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={styles.timer_background}>
+            <View style={{}}>
+              <Text>
+                <View style={{}}>
+                  <Text>
+                    <TouchableOpacity
+                      disabled={
+                        typeName === '' || validation.timer ? true : false
+                      }
+                      onPress={() => {
+                        setSelectedTimer('firstTimer');
+                        let date = new Date();
+                        const presentTime = date.toLocaleTimeString('en-US', {
+                          hour12: false,
+                        });
+                        setBeforeStart(prevState => ({
+                          ...prevState,
+                          firstTimer: presentTime,
+                        }));
+                        setRunning(prevState => ({
+                          ...prevState,
+                          firstTimer: true,
+                        }));
+                      }}>
+                      <PlayIcon
+                        name="play-circle-outline"
+                        size={28}
+                        color="#fff"
+                        style={{alignItems: 'center'}}
+                      />
+                    </TouchableOpacity>
+                  </Text>
+                </View>
+                <View style={{padding: 3}}>
+                  <Text style={{fontSize: 20, color: '#fff'}}>
+                    {beforeStart.firstTimer}
+                  </Text>
+                </View>
+              </Text>
+            </View>
+
+            <View style={{}}>
+              <Text>
+                <View>
+                  <Text>
+                    <TouchableOpacity
+                      disabled={running.firstTimer ? false : true}
+                      onPress={() => {
+                        setRunning({
+                          ...running,
+                          firstTimer: false,
+                        });
+                        setValidation({
+                          ...validation,
+                          firstPassenger: true,
+                        });
+                        setResetValidation({
+                          ...resetValidation,
+                          firstReset: false,
+                        });
+                      }}>
+                      <StopIcon
+                        name="stop-circle-outline"
+                        size={28}
+                        color="#ffff"
+                      />
+                    </TouchableOpacity>
+                  </Text>
+                </View>
+                <View style={{padding: 3}}>
+                  <Text style={{fontSize: 20, color: '#fff'}}>
+                    {time.firstTimer}
+                  </Text>
+                </View>
+              </Text>
+            </View>
           </View>
         </View>
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-around',
-            marginTop: 10,
-            marginHorizontal: 30,
-            backgroundColor: '#EA8B5B',
-            marginTop: 8,
-            width: Dimensions.get('window').width * 0.8,
-            height: Dimensions.get('window').height * 0.08,
-            borderRadius: 5,
-            alignItems: 'center',
-          }}>
-          <View
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}>
-            <Text>
-              <TouchableOpacity
-                onPress={() => {
-                  setSelectedTimer('secondTimer');
-                  let date = new Date();
-                  const presentTime = date.toLocaleTimeString();
-                  setBeforeStart(prevState => ({
-                    ...prevState,
-                    secondTimer: presentTime,
-                  }));
-                  setRunning(prevState => ({
-                    ...prevState,
-                    secondTimer: true,
-                  }));
-                }}>
-                <PlayIcon
-                  name="playcircleo"
-                  size={28}
-                  color="#fff"
-                  style={{marginTop: 4}}
-                />
-              </TouchableOpacity>{' '}
-            </Text>
 
-            <Text style={{fontSize: 20, color: '#fff', marginTop: 5}}>
-              {' '}
-              {beforeStart.secondTimer}
-            </Text>
-          </View>
-          <View
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}>
-            <Text style={{}}>
+        <View>
+          <View style={styles.section}>
+            <View>
+              <Text
+                style={{
+                  color: 'black',
+                  fontSize: 20,
+                  textAlign: 'center',
+                }}>
+                Passenger 2
+              </Text>
+            </View>
+
+            <View>
               <TouchableOpacity
                 onPress={() => {
+                  setResetValidation({
+                    ...resetValidation,
+                    secondReset: true,
+                  });
+                  setTime({
+                    ...time,
+                    secondTimer: '00:00:00',
+                  });
+                  setBeforeStart({
+                    ...beforeStart,
+                    secondTimer: '00:00:00',
+                  });
                   setRunning({
                     ...running,
                     secondTimer: false,
                   });
+                  setValidation({
+                    ...validation,
+                    firstPassenger: true,
+                  });
+                  setTimeRecorded(prevState => ({
+                    ...prevState,
+                    passenger2: {
+                      ...prevState.passenger2,
+                      start_time: '00:00:00',
+                      end_time: '00.00.00.0',
+                    },
+                  }));
+                  setMilliSec({
+                    ...millisec,
+                    secondTimer: '00:00:00.0',
+                  });
                 }}>
-                <StopIcon
-                  name="stop-circle-outline"
-                  size={32}
-                  color="#ffff"
-                  style={{}}
-                />
-              </TouchableOpacity>{' '}
-            </Text>
-            <Text style={{fontSize: 20, marginTop: 5, color: '#fff'}}>
-              {' '}
-              {time.secondTimer}
-            </Text>
+                <View>
+                  <Text style={{}}>
+                    <ResetIcon
+                      name="retweet"
+                      size={25}
+                      color="#000"
+                      style={{}}
+                    />
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={styles.timer_background}>
+            <View style={{}}>
+              <Text>
+                <View style={{}}>
+                  <Text>
+                    <TouchableOpacity
+                      disabled={validation.firstPassenger ? false : true}
+                      onPress={() => {
+                        setSelectedTimer('secondTimer');
+                        let date = new Date();
+                        const presentTime = date.toLocaleTimeString('en-US', {
+                          hour12: false,
+                        });
+                        setBeforeStart(prevState => ({
+                          ...prevState,
+                          secondTimer: presentTime,
+                        }));
+                        setRunning(prevState => ({
+                          ...prevState,
+                          secondTimer: true,
+                        }));
+                        setValidation({
+                          ...validation,
+                          timer: true,
+                        });
+                      }}>
+                      <PlayIcon
+                        name="play-circle-outline"
+                        size={28}
+                        color="#fff"
+                        style={{alignItems: 'center'}}
+                      />
+                    </TouchableOpacity>
+                  </Text>
+                </View>
+                <View style={{padding: 3}}>
+                  <Text style={{fontSize: 20, color: '#fff'}}>
+                    {beforeStart.secondTimer}
+                  </Text>
+                </View>
+              </Text>
+            </View>
+
+            <View style={{}}>
+              <Text>
+                <View>
+                  <Text>
+                    <TouchableOpacity
+                      disabled={running.secondTimer ? false : true}
+                      onPress={() => {
+                        setRunning({
+                          ...running,
+                          secondTimer: false,
+                        });
+                        setValidation({
+                          ...validation,
+                          secondPassenger: true,
+                        });
+                        setResetValidation({
+                          ...resetValidation,
+                          secondReset: false,
+                        });
+                      }}>
+                      <StopIcon
+                        name="stop-circle-outline"
+                        size={28}
+                        color="#ffff"
+                      />
+                    </TouchableOpacity>
+                  </Text>
+                </View>
+                <View style={{padding: 3}}>
+                  <Text style={{fontSize: 20, color: '#fff'}}>
+                    {time.secondTimer}
+                  </Text>
+                </View>
+              </Text>
+            </View>
           </View>
         </View>
-      </View>
 
-      <View>
-        <View style={styles.section}>
-          <View>
-            <Text
-              style={{
-                color: 'black',
-                fontSize: 20,
-                textAlign: 'center',
-              }}>
-              Passenger 3
-            </Text>
-          </View>
-
-          <View>
-            <TouchableOpacity
-              onPress={() => {
-                setTime({
-                  ...time,
-                  thirdTimer: '00:00:00',
-                });
-                setBeforeStart({
-                  ...beforeStart,
-                  thirdTimer: '00:00:00',
-                });
-                setRunning({
-                  ...running,thirdTimer:false
-                })
-              }}>
-              <View>
-                <Text style={{}}>
-                  <ResetIcon name="retweet" size={25} color="#000" style={{}} />
-                </Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-around',
-            marginTop: 10,
-            marginHorizontal: 30,
-            backgroundColor: '#EA8B5B',
-            marginTop: 8,
-            width: Dimensions.get('window').width * 0.8,
-            height: Dimensions.get('window').height * 0.08,
-            borderRadius: 5,
-            alignItems: 'center',
-          }}>
-          <View
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}>
-            <Text>
-              <TouchableOpacity
-                onPress={() => {
-                  setSelectedTimer('thirdTimer');
-                  let date = new Date();
-                  const presentTime = date.toLocaleTimeString();
-                  setBeforeStart(prevState => ({
-                    ...prevState,
-                    thirdTimer: presentTime,
-                  }));
-                  setRunning(prevState => ({
-                    ...prevState,
-                    thirdTimer: true,
-                  }));
+        <View>
+          <View style={styles.section}>
+            <View>
+              <Text
+                style={{
+                  color: 'black',
+                  fontSize: 20,
+                  textAlign: 'center',
                 }}>
-                <PlayIcon
-                  name="playcircleo"
-                  size={28}
-                  color="#fff"
-                  style={{marginTop: 4}}
-                />
-              </TouchableOpacity>{' '}
-            </Text>
+                Passenger 3
+              </Text>
+            </View>
 
-            <Text style={{fontSize: 20, color: '#fff', marginTop: 5}}>
-              {' '}
-              {beforeStart.thirdTimer}
-            </Text>
-          </View>
-          <View
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}>
-            <Text style={{}}>
+            <View>
               <TouchableOpacity
                 onPress={() => {
+                  setResetValidation({
+                    ...resetValidation,
+                    thirdReset: true,
+                  });
+                  setTime({
+                    ...time,
+                    thirdTimer: '00:00:00',
+                  });
+                  setBeforeStart({
+                    ...beforeStart,
+                    thirdTimer: '00:00:00',
+                  });
                   setRunning({
                     ...running,
                     thirdTimer: false,
                   });
+                  setValidation({
+                    ...validation,
+                    secondPassenger: true,
+                  });
+                  setTimeRecorded(prevState => ({
+                    ...prevState,
+                    passenger3: {
+                      ...prevState.passenger3,
+                      start_time: '00:00:00',
+                      end_time: '00.00.00.0',
+                    },
+                  }));
+                  setMilliSec({
+                    ...millisec,
+                    thirdTimer: '00:00:00.0',
+                  });
                 }}>
-                <StopIcon
-                  name="stop-circle-outline"
-                  size={32}
-                  color="#ffff"
-                  style={{}}
-                />
-              </TouchableOpacity>{' '}
-            </Text>
-            <Text style={{fontSize: 20, marginTop: 5, color: '#fff'}}>
-              {' '}
-              {time.thirdTimer}
-            </Text>
+                <View>
+                  <Text style={{}}>
+                    <ResetIcon
+                      name="retweet"
+                      size={25}
+                      color="#000"
+                      style={{}}
+                    />
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={styles.timer_background}>
+            <View style={{}}>
+              <Text>
+                <View style={{}}>
+                  <Text>
+                    <TouchableOpacity
+                      disabled={validation.secondPassenger ? false : true}
+                      onPress={() => {
+                        setSelectedTimer('thirdTimer');
+                        let date = new Date();
+                        const presentTime = date.toLocaleTimeString('en-US', {
+                          hour12: false,
+                        });
+                        setBeforeStart(prevState => ({
+                          ...prevState,
+                          thirdTimer: presentTime,
+                        }));
+                        setRunning(prevState => ({
+                          ...prevState,
+                          thirdTimer: true,
+                        }));
+                        setValidation({
+                          ...validation,
+                          firstPassenger: false,
+                        });
+                      }}>
+                      <PlayIcon
+                        name="play-circle-outline"
+                        size={28}
+                        color="#fff"
+                        style={{alignItems: 'center'}}
+                      />
+                    </TouchableOpacity>
+                  </Text>
+                </View>
+                <View style={{padding: 3}}>
+                  <Text style={{fontSize: 20, color: '#fff'}}>
+                    {beforeStart.thirdTimer}
+                  </Text>
+                </View>
+              </Text>
+            </View>
+
+            <View style={{}}>
+              <Text>
+                <View>
+                  <Text>
+                    <TouchableOpacity
+                      disabled={running.thirdTimer ? false : true}
+                      onPress={() => {
+                        setRunning({
+                          ...running,
+                          thirdTimer: false,
+                        });
+                        setValidation({
+                          ...validation,
+                          thirdPassenger: true,
+                        });
+                        setResetValidation({
+                          ...resetValidation,
+                          thirdReset: false,
+                        });
+                      }}>
+                      <StopIcon
+                        name="stop-circle-outline"
+                        size={28}
+                        color="#ffff"
+                      />
+                    </TouchableOpacity>
+                  </Text>
+                </View>
+                <View style={{padding: 3}}>
+                  <Text style={{fontSize: 20, color: '#fff'}}>
+                    {time.thirdTimer}
+                  </Text>
+                </View>
+              </Text>
+            </View>
           </View>
         </View>
-      </View>
 
-      <View>
-        <View style={styles.section}>
-          <View>
-            <Text
-              style={{
-                color: 'black',
-                fontSize: 20,
-                textAlign: 'center',
-              }}>
-              Passenger 4
-            </Text>
-          </View>
-
-          <View>
-            <TouchableOpacity
-              onPress={() => {
-                setTime({
-                  ...time,
-                  fourthTimer: '00:00:00',
-                });
-                setBeforeStart({
-                  ...beforeStart,
-                  fourthTimer: '00:00:00',
-                });
-                setRunning({
-                  ...running,fourthTimer:false
-                })
-              }}>
-              <View>
-                <Text style={{}}>
-                  <ResetIcon name="retweet" size={25} color="#000" style={{}} />
-                </Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-around',
-            marginTop: 10,
-            marginHorizontal: 30,
-            backgroundColor: '#EA8B5B',
-            marginTop: 8,
-            width: Dimensions.get('window').width * 0.8,
-            height: Dimensions.get('window').height * 0.08,
-            borderRadius: 5,
-            alignItems: 'center',
-          }}>
-          <View
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}>
-            <Text>
-              <TouchableOpacity
-                onPress={() => {
-                  setSelectedTimer('fourthTimer');
-                  let date = new Date();
-                  const presentTime = date.toLocaleTimeString();
-                  setBeforeStart(prevState => ({
-                    ...prevState,
-                    fourthTimer: presentTime,
-                  }));
-                  setRunning(prevState => ({
-                    ...prevState,
-                    fourthTimer: true,
-                  }));
+        <View>
+          <View style={styles.section}>
+            <View>
+              <Text
+                style={{
+                  color: 'black',
+                  fontSize: 20,
+                  textAlign: 'center',
                 }}>
-                <PlayIcon
-                  name="playcircleo"
-                  size={28}
-                  color="#fff"
-                  style={{marginTop: 4}}
-                />
-              </TouchableOpacity>{' '}
-            </Text>
+                Passenger 4
+              </Text>
+            </View>
 
-            <Text style={{fontSize: 20, color: '#fff', marginTop: 5}}>
-              {' '}
-              {beforeStart.fourthTimer}
-            </Text>
-          </View>
-          <View
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}>
-            <Text style={{}}>
+            <View>
               <TouchableOpacity
                 onPress={() => {
+                  setResetValidation({
+                    ...resetValidation,
+                    fourthReset: true,
+                  });
+                  setTime({
+                    ...time,
+                    fourthTimer: '00:00:00',
+                  });
+                  setBeforeStart({
+                    ...beforeStart,
+                    fourthTimer: '00:00:00',
+                  });
                   setRunning({
                     ...running,
                     fourthTimer: false,
                   });
+                  setValidation({
+                    ...validation,
+                    thirdPassenger: true,
+                  });
+                  setTimeRecorded(prevState => ({
+                    ...prevState,
+                    passenger4: {
+                      ...prevState.passenger4,
+                      start_time: '00:00:00',
+                      end_time: '00.00.00.0',
+                    },
+                  }));
+                  setMilliSec({
+                    ...millisec,
+                    fourthTimer: '00:00:00.0',
+                  });
                 }}>
-                <StopIcon
-                  name="stop-circle-outline"
-                  size={32}
-                  color="#ffff"
-                  style={{}}
-                />
-              </TouchableOpacity>{' '}
-            </Text>
-            <Text style={{fontSize: 20, marginTop: 5, color: '#fff'}}>
-              {' '}
-              {time.fourthTimer}
-            </Text>
+                <View>
+                  <Text style={{}}>
+                    <ResetIcon
+                      name="retweet"
+                      size={25}
+                      color="#000"
+                      style={{}}
+                    />
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={styles.timer_background}>
+            <View style={{}}>
+              <Text>
+                <View style={{}}>
+                  <Text>
+                    <TouchableOpacity
+                      disabled={validation.thirdPassenger ? false : true}
+                      onPress={() => {
+                        setSelectedTimer('fourthTimer');
+                        let date = new Date();
+                        const presentTime = date.toLocaleTimeString('en-US', {
+                          hour12: false,
+                        });
+                        setBeforeStart(prevState => ({
+                          ...prevState,
+                          fourthTimer: presentTime,
+                        }));
+                        setRunning(prevState => ({
+                          ...prevState,
+                          fourthTimer: true,
+                        }));
+                        setValidation({
+                          ...validation,
+                          secondPassenger: false,
+                        });
+                      }}>
+                      <PlayIcon
+                        name="play-circle-outline"
+                        size={28}
+                        color="#fff"
+                        style={{alignItems: 'center'}}
+                      />
+                    </TouchableOpacity>
+                  </Text>
+                </View>
+                <View style={{padding: 3}}>
+                  <Text style={{fontSize: 20, color: '#fff'}}>
+                    {beforeStart.fourthTimer}
+                  </Text>
+                </View>
+              </Text>
+            </View>
+
+            <View style={{}}>
+              <Text>
+                <View>
+                  <Text>
+                    <TouchableOpacity
+                      disabled={running.fourthTimer ? false : true}
+                      onPress={() => {
+                        setRunning({
+                          ...running,
+                          fourthTimer: false,
+                        });
+                        setValidation({
+                          ...validation,
+                          fourthPassenger: true,
+                        });
+                        setResetValidation({
+                          ...resetValidation,
+                          fourthReset: false,
+                        });
+                      }}>
+                      <StopIcon
+                        name="stop-circle-outline"
+                        size={28}
+                        color="#ffff"
+                      />
+                    </TouchableOpacity>
+                  </Text>
+                </View>
+                <View style={{padding: 3}}>
+                  <Text style={{fontSize: 20, color: '#fff'}}>
+                    {time.fourthTimer}
+                  </Text>
+                </View>
+              </Text>
+            </View>
           </View>
         </View>
-      </View>
 
-      <View>
-        <View style={styles.section}>
-          <View>
-            <Text
-              style={{
-                color: 'black',
-                fontSize: 20,
-                textAlign: 'center',
-              }}>
-              Passenger 5
-            </Text>
-          </View>
-
-          <View>
-            <TouchableOpacity
-              onPress={() => {
-                setTime({
-                  ...time,
-                  fifthTimer: '00:00:00',
-                });
-                setBeforeStart({
-                  ...beforeStart,
-                  fifthTimer: '00:00:00',
-                });
-                setRunning({
-                  ...running,fifthTimer:false
-                })
-              }}>
-              <View>
-                <Text style={{}}>
-                  <ResetIcon name="retweet" size={25} color="#000" style={{}} />
-                </Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-around',
-            marginTop: 10,
-            marginHorizontal: 30,
-            backgroundColor: '#EA8B5B',
-            marginTop: 8,
-            width: Dimensions.get('window').width * 0.8,
-            height: Dimensions.get('window').height * 0.08,
-            borderRadius: 5,
-            alignItems: 'center',
-          }}>
-          <View
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}>
-            <Text>
-              <TouchableOpacity
-                onPress={() => {
-                  setSelectedTimer('fifthTimer');
-                  let date = new Date();
-                  const presentTime = date.toLocaleTimeString();
-                  setBeforeStart(prevState => ({
-                    ...prevState,
-                    fifthTimer: presentTime,
-                  }));
-                  setRunning(prevState => ({
-                    ...prevState,
-                    fifthTimer: true,
-                  }));
+        <View>
+          <View style={styles.section}>
+            <View>
+              <Text
+                style={{
+                  color: 'black',
+                  fontSize: 20,
+                  textAlign: 'center',
                 }}>
-                <PlayIcon
-                  name="playcircleo"
-                  size={28}
-                  color="#fff"
-                  style={{marginTop: 4}}
-                />
-              </TouchableOpacity>{' '}
-            </Text>
+                Passenger 5
+              </Text>
+            </View>
 
-            <Text style={{fontSize: 20, color: '#fff', marginTop: 5}}>
-              {' '}
-              {beforeStart.fifthTimer}
-            </Text>
-          </View>
-          <View
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}>
-            <Text style={{}}>
+            <View>
               <TouchableOpacity
                 onPress={() => {
+                  setResetValidation({
+                    ...resetValidation,
+                    fifthReset: true,
+                  });
+                  setTime({
+                    ...time,
+                    fifthTimer: '00:00:00',
+                  });
+                  setBeforeStart({
+                    ...beforeStart,
+                    fifthTimer: '00:00:00',
+                  });
                   setRunning({
                     ...running,
                     fifthTimer: false,
                   });
+                  setValidation({
+                    ...validation,
+                    fourthPassenger: true,
+                    fifthPassenger: false,
+                  });
+                  setTimeRecorded(prevState => ({
+                    ...prevState,
+                    passenger5: {
+                      ...prevState.passenger5,
+                      start_time: '00:00:00',
+                      end_time: '00.00.00.0',
+                    },
+                  }));
+                  setMilliSec({
+                    ...millisec,
+                    fifthTimer: '00:00:00.0',
+                  });
                 }}>
-                <StopIcon
-                  name="stop-circle-outline"
-                  size={32}
-                  color="#ffff"
-                  style={{}}
-                />
-              </TouchableOpacity>{' '}
-            </Text>
-            <Text style={{fontSize: 20, marginTop: 5, color: '#fff'}}>
-              {' '}
-              {time.fifthTimer}
-            </Text>
+                <View>
+                  <Text style={{}}>
+                    <ResetIcon
+                      name="retweet"
+                      size={25}
+                      color="#000"
+                      style={{}}
+                    />
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <View style={styles.timer_background}>
+            <View style={{}}>
+              <Text>
+                <View style={{}}>
+                  <Text>
+                    <TouchableOpacity
+                      disabled={validation.fourthPassenger ? false : true}
+                      onPress={() => {
+                        setSelectedTimer('fifthTimer');
+                        let date = new Date();
+                        const presentTime = date.toLocaleTimeString('en-US', {
+                          hour12: false,
+                        });
+                        setBeforeStart(prevState => ({
+                          ...prevState,
+                          fifthTimer: presentTime,
+                        }));
+                        setRunning(prevState => ({
+                          ...prevState,
+                          fifthTimer: true,
+                        }));
+                        setValidation({
+                          ...validation,
+                          thirdPassenger: false,
+                        });
+                      }}>
+                      <PlayIcon
+                        name="play-circle-outline"
+                        size={28}
+                        color="#fff"
+                        style={{alignItems: 'center'}}
+                      />
+                    </TouchableOpacity>
+                  </Text>
+                </View>
+                <View style={{padding: 3}}>
+                  <Text style={{fontSize: 20, color: '#fff'}}>
+                    {beforeStart.fifthTimer}
+                  </Text>
+                </View>
+              </Text>
+            </View>
+
+            <View style={{}}>
+              <Text>
+                <View>
+                  <Text>
+                    <TouchableOpacity
+                      disabled={running.fifthTimer ? false : true}
+                      onPress={() => {
+                        setRunning({
+                          ...running,
+                          fifthTimer: false,
+                        });
+                        setValidation({
+                          ...validation,
+                          fifthPassenger: true,
+                        });
+                        setResetValidation({
+                          ...resetValidation,
+                          fifthReset: false,
+                        });
+                      }}>
+                      <StopIcon
+                        name="stop-circle-outline"
+                        size={28}
+                        color="#ffff"
+                      />
+                    </TouchableOpacity>
+                  </Text>
+                </View>
+                <View style={{padding: 3}}>
+                  <Text style={{fontSize: 20, color: '#fff'}}>
+                    {time.fifthTimer}
+                  </Text>
+                </View>
+              </Text>
+            </View>
           </View>
         </View>
-      </View>
-      <View style={{alignItems: 'center'}}>
+
+        <View style={{alignItems: 'center'}}>
           <TouchableOpacity
-            style={styles.submitButton}
-            onPress={() => {
-              setAirportValue(null);
-              setClassValue(null);
-              setMannedValue(null);
-              SetCounter(null);
-            }}>
+            // disabled={
+            //   validation.fifthPassenger &&
+            //   type != '' &&
+            //   !resetValidation.firstReset &&
+            //   !resetValidation.secondReset &&
+            //   !resetValidation.thirdReset &&
+            //   !resetValidation.fourthReset &&
+            //   !resetValidation.fifthReset
+            //     ? false
+            //     : true
+            // }
+            style={{
+              ...styles.submitButton,
+              backgroundColor:
+                validation.fifthPassenger &&
+                type != '' &&
+                !resetValidation.firstReset &&
+                !resetValidation.secondReset &&
+                !resetValidation.thirdReset &&
+                !resetValidation.fourthReset &&
+                !resetValidation.fifthReset
+                  ? '#EA8B5B'
+                  : 'grey',
+            }}
+            onPress={handleSubmit}>
             <Text style={styles.buttonText}>Submit</Text>
           </TouchableOpacity>
         </View>
         <View style={{alignItems: 'center'}}>
-          <TouchableOpacity
-            style={styles.BackButton}
-            onPress={() => {
-              navigation.navigate('Area');
-            }}>
+          <TouchableOpacity style={styles.BackButton} onPress={backButton}>
             <Text style={styles.buttonText}>Back</Text>
           </TouchableOpacity>
         </View>
-        </ScrollView>
- </View>
-  )
-}
+      </ScrollView>
+    </View>
+  );
+};
 
-export default Parking
+export default Parking;
 
-const styles=StyleSheet.create({
+const styles = StyleSheet.create({
   contain: {
     flex: 1,
     backgroundColor: '#fdf4e0',
@@ -748,11 +1083,10 @@ const styles=StyleSheet.create({
   },
   dropdown: {
     marginLeft: 5,
-    // width: Dimensions.get('window').width * 0.3,
-    height: 50,
     backgroundColor: '#EA8B5B',
+    width: Dimensions.get('window').width * 0.35,
     borderRadius: 12,
-    padding: 25,
+    padding: 12,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -799,6 +1133,18 @@ const styles=StyleSheet.create({
     marginHorizontal: 20,
     justifyContent: 'space-around',
   },
+  timer_background: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 10,
+    marginHorizontal: 30,
+    backgroundColor: '#EA8B5B',
+    marginTop: 8,
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
   submitButton: {
     backgroundColor: '#EA8B5B',
     marginTop: 40,
@@ -824,4 +1170,4 @@ const styles=StyleSheet.create({
     marginBottom: 20,
     verticalAlign: 'center',
   },
-})
+});
