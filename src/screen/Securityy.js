@@ -2,7 +2,7 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
+  Pressable,
   Dimensions,
   ScrollView,
   Alert,
@@ -26,28 +26,32 @@ const Securityy = () => {
   const airportValue = route.params.airportName;
   const terminal = route.params.terminal;
 
-  const [time, setTime] = useState({
-    firstTimer: '00:00:00',
-    secondTimer: '00:00:00',
-    thirdTimer: '00:00:00',
-    fourthTimer: '00:00:00',
-    fifthTimer: '00:00:00',
-    sixthTimer: '00:00:00',
-    seventhTimer: '00:00:00',
-    eighthTimer: '00:00:00',
-    ninthTimer: '00:00:00',
-  });
-  const [running, setRunning] = useState({
-    firstTimer: false,
-    secondTimer: false,
-    thirdTimer: false,
-    fourthTimer: false,
-    fifthTimer: false,
-    sixthTimer: false,
-    seventhTimer: false,
-    eighthTimer: false,
-    ninthTimer: false,
-  });
+  const [firstRunning, setFirstRunning] = useState(false);
+  const [firstTime, setFirstTime] = useState('00:00:00');
+
+  const [secondRunning, setSecondRunning] = useState(false);
+  const [secondTime, setSecondTime] = useState('00:00:00');
+
+  const [thirdRunning, setThirdRunning] = useState(false);
+  const [thirdTime, setThirdTime] = useState('00:00:00');
+
+  const [fourthRunning, setFourthRunning] = useState(false);
+  const [fourthTime, setFourthTime] = useState('00:00:00');
+
+  const [fifthRunning, setFifthRunning] = useState(false);
+  const [fifthTime, setFifthTime] = useState('00:00:00');
+
+  const [sixthRunning, setSixthRunning] = useState(false);
+  const [sixthTime, setSixthTime] = useState('00:00:00');
+
+  const [seventhRunning, setSeventhRunning] = useState(false);
+  const [seventhTime, setSeventhTime] = useState('00:00:00');
+
+  const [eighthRunning, setEighthRunning] = useState(false);
+  const [eighthTime, setEighthTime] = useState('00:00:00');
+
+  const [ninthRunning, setNinthRunning] = useState(false);
+  const [ninthTime, setNinthTime] = useState('00:00:00');
 
   const [beforeStart, setBeforeStart] = useState({
     firstTimer: '00:00:00',
@@ -62,6 +66,7 @@ const Securityy = () => {
   });
 
   const [selectedTimer, setSelectedTimer] = useState('');
+  const [validationTimer, setValidationTimer] = useState(false);
 
   const [validation, setValidation] = useState({
     timers: false,
@@ -147,170 +152,228 @@ const Securityy = () => {
     },
   ]);
 
-  // const [timeRecorded, setTimeRecorded] = useState({
-  //   line1: {
-  //     start_time: '00:00:00',
-  //     end_time: '00:00:00.0',
-  //   },
-  //   line2: {
-  //     start_time: '00.00.00',
-  //     end_time: '00:00:00.0',
-  //   },
-  //   line3: {
-  //     start_time: '00.00.00',
-  //     end_time: '00:00:00.0',
-  //   },
-  //   line4: {
-  //     start_time: '00.00.00',
-  //     end_time: '00:00:00.0',
-  //   },
-  //   line5: {
-  //     start_time: '00.00.00',
-  //     end_time: '00:00:00.0',console
-  //   },
-  //   line6: {
-  //     start_time: '00.00.00',
-  //     end_time: '00:00:00.0',
-  //   },
-  //   line7: {
-  //     start_time: '00.00.00',
-  //     end_time: '00:00:00.0',
-  //   },
-  //   line8: {
-  //     start_time: '00.00.00',
-  //     end_time: '00:00:00.0',
-  //   },
-  //   line9: {
-  //     start_time: '00.00.00',
-  //     end_time: '00:00:00.0',
-  //   },
-  // });
-
   useEffect(() => {
     let interval;
 
-    if (running[selectedTimer]) {
+    if (firstRunning) {
       interval = setInterval(() => {
         const presentTime = new Date().toLocaleTimeString('en-US', {
           hour12: false,
         });
-        console.log(presentTime, 'iam present time');
-        setTime({
-          ...time,
-          [selectedTimer]: presentTime,
-        });
 
-        const currentTime =
-          new Date().toLocaleTimeString() + `.${new Date().getMilliseconds()}`;
-        console.log(currentTime, 'iam current time');
-        setMilliSec(prevState => ({
-          ...millisec,
-          [selectedTimer]: currentTime,
-        }));
+        setFirstTime(presentTime);
       }, 1000);
-      console.log(time, 'gjadg');
-    } else if (!running[selectedTimer]) {
+    } else if (!firstRunning) {
       clearInterval(interval);
-
-      // setTimeRecorded(prevState => ({
-      //   ...prevState,
-      //   line1: {
-      //     ...prevState.line1,
-      //     start_time: beforeStart.firstTimer,
-      //     end_time: millisec.firstTimer,
-      //   },
-      //   line2: {
-      //     ...prevState.line2,
-      //     start_time: beforeStart.secondTimer,
-      //     end_time: millisec.secondTimer,
-      //   },
-      //   line3: {
-      //     ...prevState.line3,
-      //     start_time: beforeStart.thirdTimer,
-      //     end_time: millisec.thirdTimer,
-      //   },
-      //   line4: {
-      //     ...prevState.line4,
-      //     start_time: beforeStart.fourthTimer,
-      //     end_time: millisec.fourthTimer,
-      //   },
-      //   line5: {
-      //     ...prevState.line5,
-      //     start_time: beforeStart.fifthTimer,
-      //     end_time: millisec.fifthTimer,
-      //   },
-      //   line6: {
-      //     ...prevState.line6,
-      //     start_time: beforeStart.sixthTimer,
-      //     end_time: millisec.sixthTimer,
-      //   },
-      //   line7: {
-      //     ...prevState.line7,
-      //     start_time: beforeStart.seventhTimer,
-      //     end_time: millisec.seventhTimer,
-      //   },
-      //   line8: {
-      //     ...prevState.line8,
-      //     start_time: beforeStart.eighthTimer,
-      //     end_time: millisec.eighthTimer,
-      //   },
-      //   line9: {
-      //     ...prevState.line9,
-      //     start_time: beforeStart.ninthTimer,
-      //     end_time: millisec.ninthTimer,
-      //   },
-      // }));
       const data = [...timeRecorded];
       data[0].passenger1.firstTimer.start_time = beforeStart.firstTimer;
-      data[0].passenger1.firstTimer.end_time = millisec.firstTimer;
-      data[0].passenger1.secondTimer.start_time = beforeStart.secondTimer;
-      data[0].passenger1.secondTimer.end_time = millisec.secondTimer;
-      data[0].passenger1.thirdTimer.start_time = beforeStart.thirdTimer;
-      data[0].passenger1.thirdTimer.end_time = millisec.thirdTimer;
-      data[0].passenger2.firstTimer.start_time = beforeStart.fourthTimer;
-      data[0].passenger2.firstTimer.end_time = millisec.fourthTimer;
-      data[0].passenger2.secondTimer.start_time = beforeStart.fifthTimer;
-      data[0].passenger2.secondTimer.end_time = millisec.fifthTimer;
-      data[0].passenger2.thirdTimer.start_time = beforeStart.sixthTimer;
-      data[0].passenger2.thirdTimer.end_time = millisec.sixthTimer;
-      data[0].passenger3.firstTimer.start_time = beforeStart.seventhTimer;
-      data[0].passenger3.firstTimer.end_time = millisec.seventhTimer;
-      data[0].passenger3.secondTimer.start_time = beforeStart.eighthTimer;
-      data[0].passenger3.secondTimer.end_time = millisec.eighthTimer;
-      data[0].passenger3.thirdTimer.start_time = beforeStart.ninthTimer;
-      data[0].passenger3.thirdTimer.end_time = millisec.ninthTimer;
-
+      data[0].passenger1.firstTimer.end_time = firstTime;
       setTimeRecorded(data);
     }
-
     return () => {
       clearInterval(interval);
     };
-  }, [
-    running.firstTimer,
-    running.secondTimer,
-    running.thirdTimer,
-    running.fourthTimer,
-    running.fifthTimer,
-    running.sixthTimer,
-    running.seventhTimer,
-    running.eighthTimer,
-    running.ninthTimer,
-  ]);
+  }, [firstRunning]);
+
+  useEffect(() => {
+    let interval;
+
+    if (secondRunning) {
+      interval = setInterval(() => {
+        const presentTime = new Date().toLocaleTimeString('en-US', {
+          hour12: false,
+        });
+
+        setSecondTime(presentTime);
+      }, 1000);
+    } else if (!secondRunning) {
+      clearInterval(interval);
+      const data = [...timeRecorded];
+      data[0].passenger1.secondTimer.start_time = beforeStart.secondTimer;
+      data[0].passenger1.secondTimer.end_time = secondTime;
+      setTimeRecorded(data);
+    }
+    return () => {
+      clearInterval(interval);
+    };
+  }, [secondRunning]);
+
+  useEffect(() => {
+    let interval;
+
+    if (thirdRunning) {
+      console.log('its ruingggggggggggggg');
+      interval = setInterval(() => {
+        console.log(secondTime, 'before running');
+        const presentTime = new Date().toLocaleTimeString('en-US', {
+          hour12: false,
+        });
+        console.log(presentTime, 'after runnuing');
+
+        setThirdTime(presentTime);
+      }, 1000);
+    } else if (!thirdRunning) {
+      clearInterval(interval);
+      const data = [...timeRecorded];
+      // data[0].passenger1.thirdTimer.start_time = beforeStart.thirdTimer;
+      data[0].passenger1.thirdTimer.start_time =
+        data[0].passenger1.secondTimer.end_time;
+      data[0].passenger1.thirdTimer.end_time = thirdTime;
+
+      setTimeRecorded(data);
+    }
+    return () => {
+      clearInterval(interval);
+    };
+  }, [thirdRunning]);
+
+  console.log(thirdTime, beforeStart.thirdTimer);
+
+  useEffect(() => {
+    let interval;
+
+    if (fourthRunning) {
+      interval = setInterval(() => {
+        const presentTime = new Date().toLocaleTimeString('en-US', {
+          hour12: false,
+        });
+
+        setFourthTime(presentTime);
+      }, 1000);
+    } else if (!fourthRunning) {
+      clearInterval(interval);
+      const data = [...timeRecorded];
+      data[0].passenger2.firstTimer.start_time = beforeStart.fourthTimer;
+      data[0].passenger2.firstTimer.end_time = fourthTime;
+      setTimeRecorded(data);
+    }
+    return () => {
+      clearInterval(interval);
+    };
+  }, [fourthRunning]);
+
+  useEffect(() => {
+    let interval;
+
+    if (fifthRunning) {
+      interval = setInterval(() => {
+        const presentTime = new Date().toLocaleTimeString('en-US', {
+          hour12: false,
+        });
+
+        setFifthTime(presentTime);
+      }, 1000);
+    } else if (!fifthRunning) {
+      clearInterval(interval);
+      const data = [...timeRecorded];
+      data[0].passenger2.secondTimer.start_time = beforeStart.fifthTimer;
+      data[0].passenger2.secondTimer.end_time = fifthTime;
+      setTimeRecorded(data);
+    }
+    return () => {
+      clearInterval(interval);
+    };
+  }, [fifthRunning]);
+
+  useEffect(() => {
+    let interval;
+
+    if (sixthRunning) {
+      interval = setInterval(() => {
+        const presentTime = new Date().toLocaleTimeString('en-US', {
+          hour12: false,
+        });
+
+        setSixthTime(presentTime);
+      }, 1000);
+    } else if (!sixthRunning) {
+      clearInterval(interval);
+      const data = [...timeRecorded];
+      // data[0].passenger2.thirdTimer.start_time = beforeStart.sixthTimer;
+      data[0].passenger2.thirdTimer.start_time =
+        data[0].passenger2.secondTimer.end_time;
+
+      data[0].passenger2.thirdTimer.end_time = sixthTime;
+      setTimeRecorded(data);
+    }
+    return () => {
+      clearInterval(interval);
+    };
+  }, [sixthRunning]);
+
+  useEffect(() => {
+    let interval;
+
+    if (seventhRunning) {
+      interval = setInterval(() => {
+        const presentTime = new Date().toLocaleTimeString('en-US', {
+          hour12: false,
+        });
+
+        setSeventhTime(presentTime);
+      }, 1000);
+    } else if (!seventhRunning) {
+      clearInterval(interval);
+      const data = [...timeRecorded];
+      data[0].passenger3.firstTimer.start_time = beforeStart.seventhTimer;
+      data[0].passenger3.firstTimer.end_time = seventhTime;
+      setTimeRecorded(data);
+    }
+    return () => {
+      clearInterval(interval);
+    };
+  }, [seventhRunning]);
+
+  useEffect(() => {
+    let interval;
+
+    if (eighthRunning) {
+      interval = setInterval(() => {
+        const presentTime = new Date().toLocaleTimeString('en-US', {
+          hour12: false,
+        });
+
+        setEighthTime(presentTime);
+      }, 1000);
+    } else if (!eighthRunning) {
+      clearInterval(interval);
+      const data = [...timeRecorded];
+      data[0].passenger3.secondTimer.start_time = beforeStart.eighthTimer;
+      data[0].passenger3.secondTimer.end_time = eighthTime;
+      setTimeRecorded(data);
+    }
+    return () => {
+      clearInterval(interval);
+    };
+  }, [eighthRunning]);
+
+  useEffect(() => {
+    let interval;
+
+    if (ninthRunning) {
+      interval = setInterval(() => {
+        const presentTime = new Date().toLocaleTimeString('en-US', {
+          hour12: false,
+        });
+
+        setNinthTime(presentTime);
+      }, 1000);
+    } else if (!ninthRunning) {
+      clearInterval(interval);
+      const data = [...timeRecorded];
+      // data[0].passenger3.thirdTimer.start_time = beforeStart.ninthTimer;
+      data[0].passenger3.thirdTimer.start_time =
+        data[0].passenger3.secondTimer.end_time;
+      data[0].passenger3.thirdTimer.end_time = ninthTime;
+      setTimeRecorded(data);
+    }
+    return () => {
+      clearInterval(interval);
+    };
+  }, [ninthRunning]);
 
   const handleSubmit = async () => {
-    if (
-      !validation.ninthTimer &&
-      !resetValidation.firstReset &&
-      !resetValidation.secondReset &&
-      !resetValidation.thirdReset &&
-      !resetValidation.fourthReset &&
-      !resetValidation.fifthReset &&
-      !resetValidation.sixthTimer &&
-      !resetValidation.seventhTimer &&
-      !resetValidation.eighthTimer &&
-      !resetValidation.ninthTimer
-    ) {
+    if (validationTimer && validation.timers) {
       const final = {
         airport_name: airportValue,
         terminal: terminal,
@@ -319,6 +382,8 @@ const Securityy = () => {
         time_recorded: timeRecorded,
       };
       console.log(final, 'iam api object');
+
+      // Alert.alert("apiiii success")
 
       const result = await postQueueData(token, final);
 
@@ -377,32 +442,20 @@ const Securityy = () => {
               </Text>
             </View>
             <View>
-              <TouchableOpacity
+              <Pressable
                 onPress={() => {
-                  console.log(running);
                   setResetValidation({
                     ...resetValidation,
                     firstTimer: true,
                     secondTimer: true,
                     thirdTimer: true,
                   });
-                  setTime({
-                    ...time,
-                    firstTimer: '00:00:00',
-                    secondTimer: '00:00:00',
-                    thirdTimer: '00:00:00',
-                  });
+
                   setBeforeStart({
                     ...beforeStart,
                     firstTimer: '00:00:00',
                     secondTimer: '00:00:00',
                     thirdTimer: '00:00:00',
-                  });
-                  setRunning({
-                    ...running,
-                    firstTimer: false,
-                    secondTimer: false,
-                    thirdTimer: false,
                   });
 
                   const data = [...timeRecorded];
@@ -420,6 +473,14 @@ const Securityy = () => {
                     timers: false,
                     firstTimer: false,
                   });
+                  setFirstRunning(false);
+                  setFirstTime('00:00:00');
+
+                  setSecondRunning(false);
+                  setSecondTime('00:00:00');
+
+                  setThirdRunning(false);
+                  setThirdTime('00:00:00');
                 }}>
                 <View>
                   <Text style={{}}>
@@ -431,7 +492,7 @@ const Securityy = () => {
                     />
                   </Text>
                 </View>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
           <View style={styles.timer_background}>
@@ -450,8 +511,7 @@ const Securityy = () => {
                   <Text>
                     <View style={{}}>
                       <Text>
-                        <TouchableOpacity
-                          disabled={validation.timers ? true : false}
+                        <Pressable
                           onPress={() => {
                             setSelectedTimer('firstTimer');
                             let date = new Date();
@@ -463,10 +523,9 @@ const Securityy = () => {
                               ...prevState,
                               firstTimer: presentTime,
                             }));
-                            setRunning(prevState => ({
-                              ...prevState,
-                              firstTimer: true,
-                            }));
+
+                            setFirstRunning(true);
+                            setValidationTimer(true);
                           }}>
                           <PlayIcon
                             name="play-circle-outline"
@@ -474,7 +533,7 @@ const Securityy = () => {
                             color="#fff"
                             style={{alignItems: 'center'}}
                           />
-                        </TouchableOpacity>
+                        </Pressable>
                       </Text>
                     </View>
                     <View style={{padding: 3}}>
@@ -489,32 +548,32 @@ const Securityy = () => {
                   <Text>
                     <View>
                       <Text>
-                        <TouchableOpacity
+                        <Pressable
+                          disabled={firstRunning ? false : true}
                           onPress={() => {
-                            setRunning({
-                              ...running,
-                              firstTimer: false,
-                            });
                             setValidation({
                               ...validation,
+                              timers: true,
+
                               firstTimer: true,
                             });
                             setResetValidation({
                               ...resetValidation,
                               firstTimer: false,
                             });
+                            setFirstRunning(false);
                           }}>
                           <StopIcon
                             name="stop-circle-outline"
                             size={28}
                             color="#ffff"
                           />
-                        </TouchableOpacity>
+                        </Pressable>
                       </Text>
                     </View>
                     <View style={{padding: 3}}>
                       <Text style={{fontSize: 20, color: '#fff'}}>
-                        {time.firstTimer}
+                        {firstTime}{' '}
                       </Text>
                     </View>
                   </Text>
@@ -536,8 +595,7 @@ const Securityy = () => {
                   <Text>
                     <View style={{}}>
                       <Text>
-                        <TouchableOpacity
-                          disabled={validation.firstTimer ? false : true}
+                        <Pressable
                           onPress={() => {
                             setSelectedTimer('secondTimer');
                             let date = new Date();
@@ -549,14 +607,13 @@ const Securityy = () => {
                               ...prevState,
                               secondTimer: presentTime,
                             }));
-                            setRunning(prevState => ({
-                              ...prevState,
-                              secondTimer: true,
-                            }));
+
                             setValidation({
                               ...validation,
                               timers: true,
                             });
+                            setSecondRunning(true);
+                            setValidationTimer(true);
                           }}>
                           <PlayIcon
                             name="play-circle-outline"
@@ -564,7 +621,7 @@ const Securityy = () => {
                             color="#fff"
                             style={{alignItems: 'center'}}
                           />
-                        </TouchableOpacity>
+                        </Pressable>
                       </Text>
                     </View>
                     <View style={{padding: 3}}>
@@ -579,33 +636,33 @@ const Securityy = () => {
                   <Text>
                     <View>
                       <Text>
-                        <TouchableOpacity
-                          disabled={running.secondTimer ? false : true}
+                        <Pressable
+                          disabled={secondRunning ? false : true}
                           onPress={() => {
-                            setRunning({
-                              ...running,
-                              secondTimer: false,
-                            });
                             setValidation({
                               ...validation,
+                              timers: true,
+
                               secondTimer: true,
                             });
                             setResetValidation({
                               ...resetValidation,
                               secondTimer: false,
                             });
+                            setSecondRunning(false);
+                            setThirdRunning(true);
                           }}>
                           <StopIcon
                             name="stop-circle-outline"
                             size={28}
                             color="#ffff"
                           />
-                        </TouchableOpacity>
+                        </Pressable>
                       </Text>
                     </View>
                     <View style={{padding: 3}}>
                       <Text style={{fontSize: 20, color: '#fff'}}>
-                        {time.secondTimer}
+                        {secondTime}{' '}
                       </Text>
                     </View>
                   </Text>
@@ -618,87 +675,84 @@ const Securityy = () => {
               </View>
               <View
                 style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
+                  alignItems: 'center',
                   marginHorizontal: 30,
+                  alignContent: 'center',
+                  // borderWidth:'2'
                 }}>
                 <View style={{}}>
                   <Text>
-                    <View style={{}}>
-                      <Text>
-                        <TouchableOpacity
-                          disabled={validation.secondTimer ? false : true}
-                          onPress={() => {
-                            setSelectedTimer('thirdTimer');
-                            let date = new Date();
-                            const presentTime = date.toLocaleTimeString(
-                              'en-US',
-                              {hour12: false},
-                            );
-                            setBeforeStart(prevState => ({
-                              ...prevState,
-                              thirdTimer: presentTime,
-                            }));
-                            setRunning(prevState => ({
-                              ...prevState,
-                              thirdTimer: true,
-                            }));
-                            setValidation({
-                              ...validation,
-                              firstTimer: false,
-                            });
-                          }}>
-                          <PlayIcon
-                            name="play-circle-outline"
-                            size={28}
-                            color="#fff"
-                            style={{alignItems: 'center'}}
-                          />
-                        </TouchableOpacity>
-                      </Text>
-                    </View>
-                    <View style={{padding: 3}}>
-                      <Text style={{fontSize: 20, color: '#fff'}}>
-                        {beforeStart.thirdTimer}
-                      </Text>
-                    </View>
-                  </Text>
-                </View>
+                    {
+                      <>
+                        <View style={{}}>
+                          <Text>
+                            {!thirdRunning ? (
+                              <>
+                                <Pressable
+                                  onPress={() => {
+                                    setSelectedTimer('thirdTimer');
+                                    let date = new Date();
+                                    const presentTime = date.toLocaleTimeString(
+                                      'en-US',
+                                      {hour12: false},
+                                    );
+                                    setBeforeStart(prevState => ({
+                                      ...prevState,
+                                      thirdTimer: secondTime,
+                                    }));
 
-                <View style={{}}>
-                  <Text>
-                    <View>
-                      <Text>
-                        <TouchableOpacity
-                          disabled={running.thirdTimer ? false : true}
-                          onPress={() => {
-                            setRunning({
-                              ...running,
-                              thirdTimer: false,
-                            });
-                            setValidation({
-                              ...validation,
-                              thirdTimer: true,
-                            });
-                            setResetValidation({
-                              ...resetValidation,
-                              thirdTimer: false,
-                            });
-                          }}>
-                          <StopIcon
-                            name="stop-circle-outline"
-                            size={28}
-                            color="#ffff"
-                          />
-                        </TouchableOpacity>
-                      </Text>
-                    </View>
-                    <View style={{padding: 3}}>
-                      <Text style={{fontSize: 20, color: '#fff'}}>
-                        {time.thirdTimer}
-                      </Text>
-                    </View>
+                                    setThirdRunning(true);
+                                    setValidationTimer(true);
+                                  }}>
+                                  <PlayIcon
+                                    name="play-circle-outline"
+                                    size={28}
+                                    color="#fff"
+                                    style={{alignItems: 'center'}}
+                                  />
+                                </Pressable>
+                                <View style={{padding: 3}}>
+                                  <Text style={{fontSize: 20, color: '#fff'}}>
+                                    {thirdTime
+                                      ? thirdTime
+                                      : beforeStart.thirdTimer}
+                                  </Text>
+                                </View>
+                              </>
+                            ) : (
+                              <>
+                                <Pressable
+                                  disabled={thirdRunning ? false : true}
+                                  onPress={() => {
+                                    setValidation({
+                                      ...validation,
+                                      timers: true,
+
+                                      thirdTimer: true,
+                                    });
+                                    setResetValidation({
+                                      ...resetValidation,
+                                      thirdTimer: false,
+                                    });
+                                    setThirdRunning(false);
+                                  }}>
+                                  <StopIcon
+                                    name="stop-circle-outline"
+                                    size={28}
+                                    color="#ffff"
+                                  />
+                                </Pressable>
+                                <View style={{padding: 3}}>
+                                  <Text style={{fontSize: 20, color: '#fff'}}>
+                                    {thirdTime}
+                                  </Text>
+                                </View>
+                              </>
+                            )}
+                          </Text>
+                        </View>
+                      </>
+                    }
                   </Text>
                 </View>
               </View>
@@ -719,33 +773,22 @@ const Securityy = () => {
               </Text>
             </View>
             <View>
-              <TouchableOpacity
+              <Pressable
                 onPress={() => {
-                  console.log(running);
                   setResetValidation({
                     ...resetValidation,
                     fourthTimer: true,
                     fifthTimer: true,
                     sixthTimer: true,
                   });
-                  setTime({
-                    ...time,
-                    fourthTimer: '00:00:00',
-                    fifthTimer: '00:00:00',
-                    sixthTimer: '00:00:00',
-                  });
+
                   setBeforeStart({
                     ...beforeStart,
                     fourthTimer: '00:00:00',
                     fifthTimer: '00:00:00',
                     sixthTimer: '00:00:00',
                   });
-                  setRunning({
-                    ...running,
-                    fourthTimer: false,
-                    fifthTimer: false,
-                    sixthTimer: false,
-                  });
+
                   const data = [...timeRecorded];
 
                   data[0].passenger2.firstTimer.start_time = '00:00:00';
@@ -758,10 +801,19 @@ const Securityy = () => {
 
                   setValidation({
                     ...validation,
+                    timers: false,
+
                     thirdTimer: true,
                     fourthTimer: false,
                     fifthTimer: false,
                   });
+                  setFifthRunning(false);
+                  setSixthRunning(false);
+                  setFourthRunning(false);
+
+                  setFourthTime('00:00:00');
+                  setFifthTime('00:00:00');
+                  setSixthTime('00:00:00');
                 }}>
                 <View>
                   <Text style={{}}>
@@ -773,7 +825,7 @@ const Securityy = () => {
                     />
                   </Text>
                 </View>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
           <View style={styles.timer_background}>
@@ -792,8 +844,7 @@ const Securityy = () => {
                   <Text>
                     <View style={{}}>
                       <Text>
-                        <TouchableOpacity
-                          disabled={validation.thirdTimer ? false : true}
+                        <Pressable
                           onPress={() => {
                             setSelectedTimer('fourthTimer');
                             let date = new Date();
@@ -805,14 +856,9 @@ const Securityy = () => {
                               ...prevState,
                               fourthTimer: presentTime,
                             }));
-                            setRunning(prevState => ({
-                              ...prevState,
-                              fourthTimer: true,
-                            }));
-                            setValidation({
-                              ...validation,
-                              secondTimer: false,
-                            });
+
+                            setFourthRunning(true);
+                            setValidationTimer(true);
                           }}>
                           <PlayIcon
                             name="play-circle-outline"
@@ -820,7 +866,7 @@ const Securityy = () => {
                             color="#fff"
                             style={{alignItems: 'center'}}
                           />
-                        </TouchableOpacity>
+                        </Pressable>
                       </Text>
                     </View>
                     <View style={{padding: 3}}>
@@ -835,32 +881,31 @@ const Securityy = () => {
                   <Text>
                     <View>
                       <Text>
-                        <TouchableOpacity
+                        <Pressable
+                          disabled={fourthRunning ? false : true}
                           onPress={() => {
-                            setRunning({
-                              ...running,
-                              fourthTimer: false,
-                            });
                             setValidation({
                               ...validation,
+                              timers: true,
                               fourthTimer: true,
                             });
                             setResetValidation({
                               ...resetValidation,
                               fourthTimer: false,
                             });
+                            setFourthRunning(false);
                           }}>
                           <StopIcon
                             name="stop-circle-outline"
                             size={28}
                             color="#ffff"
                           />
-                        </TouchableOpacity>
+                        </Pressable>
                       </Text>
                     </View>
                     <View style={{padding: 3}}>
                       <Text style={{fontSize: 20, color: '#fff'}}>
-                        {time.fourthTimer}
+                        {fourthTime}
                       </Text>
                     </View>
                   </Text>
@@ -882,8 +927,7 @@ const Securityy = () => {
                   <Text>
                     <View style={{}}>
                       <Text>
-                        <TouchableOpacity
-                          disabled={validation.fourthTimer ? false : true}
+                        <Pressable
                           onPress={() => {
                             setSelectedTimer('fifthTimer');
                             let date = new Date();
@@ -895,14 +939,9 @@ const Securityy = () => {
                               ...prevState,
                               fifthTimer: presentTime,
                             }));
-                            setRunning(prevState => ({
-                              ...prevState,
-                              fifthTimer: true,
-                            }));
-                            setValidation({
-                              ...validation,
-                              thirdTimer: false,
-                            });
+
+                            setFifthRunning(true);
+                            setValidationTimer(true);
                           }}>
                           <PlayIcon
                             name="play-circle-outline"
@@ -910,7 +949,7 @@ const Securityy = () => {
                             color="#fff"
                             style={{alignItems: 'center'}}
                           />
-                        </TouchableOpacity>
+                        </Pressable>
                       </Text>
                     </View>
                     <View style={{padding: 3}}>
@@ -925,33 +964,33 @@ const Securityy = () => {
                   <Text>
                     <View>
                       <Text>
-                        <TouchableOpacity
-                          disabled={running.fifthTimer ? false : true}
+                        <Pressable
+                          disabled={fifthRunning ? false : true}
                           onPress={() => {
-                            setRunning({
-                              ...running,
-                              fifthTimer: false,
-                            });
                             setValidation({
                               ...validation,
+                              timers: true,
+
                               fifthTimer: true,
                             });
                             setResetValidation({
                               ...resetValidation,
                               fifthTimer: false,
                             });
+                            setFifthRunning(false);
+                            setSixthRunning(true);
                           }}>
                           <StopIcon
                             name="stop-circle-outline"
                             size={28}
                             color="#ffff"
                           />
-                        </TouchableOpacity>
+                        </Pressable>
                       </Text>
                     </View>
                     <View style={{padding: 3}}>
                       <Text style={{fontSize: 20, color: '#fff'}}>
-                        {time.fifthTimer}
+                        {fifthTime}
                       </Text>
                     </View>
                   </Text>
@@ -964,17 +1003,88 @@ const Securityy = () => {
               </View>
               <View
                 style={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
+                  alignItems: 'center',
                   marginHorizontal: 30,
+                  alignContent: 'center',
                 }}>
                 <View style={{}}>
                   <Text>
+                    {
+                      <>
+                        <View style={{}}>
+                          <Text>
+                            {!sixthRunning ? (
+                              <>
+                                <Pressable
+                                  onPress={() => {
+                                    setSelectedTimer('sixthTimer');
+                                    let date = new Date();
+                                    const presentTime = date.toLocaleTimeString(
+                                      'en-US',
+                                      {hour12: false},
+                                    );
+                                    setBeforeStart(prevState => ({
+                                      ...prevState,
+                                      sixthTimer: presentTime,
+                                    }));
+                                    setSixthRunning(true);
+                                    setValidationTimer(true);
+                                  }}>
+                                  <PlayIcon
+                                    name="play-circle-outline"
+                                    size={28}
+                                    color="#fff"
+                                    style={{alignItems: 'center'}}
+                                  />
+                                </Pressable>
+                                <View style={{padding: 3}}>
+                                  <Text style={{fontSize: 20, color: '#fff'}}>
+                                    {sixthTime
+                                      ? sixthTime
+                                      : beforeStart.sixthTimer}
+                                  </Text>
+                                </View>
+                              </>
+                            ) : (
+                              <>
+                                <Pressable
+                                  disabled={sixthRunning ? false : true}
+                                  onPress={() => {
+                                    setValidation({
+                                      ...validation,
+                                      timers: true,
+
+                                      sixthTimer: true,
+                                    });
+                                    setResetValidation({
+                                      ...resetValidation,
+                                      sixthTimer: false,
+                                    });
+                                    setSixthRunning(false);
+                                  }}>
+                                  <StopIcon
+                                    name="stop-circle-outline"
+                                    size={28}
+                                    color="#ffff"
+                                  />
+                                </Pressable>
+                                <View style={{padding: 3}}>
+                                  <Text style={{fontSize: 20, color: '#fff'}}>
+                                    {sixthTime}
+                                  </Text>
+                                </View>
+                              </>
+                            )}
+                          </Text>
+                        </View>
+                      </>
+                    }
+                  </Text>
+
+                  {/* <Text>
                     <View style={{}}>
                       <Text>
-                        <TouchableOpacity
-                          disabled={validation.fifthTimer ? false : true}
+                        <Pressable
                           onPress={() => {
                             setSelectedTimer('sixthTimer');
                             let date = new Date();
@@ -986,14 +1096,8 @@ const Securityy = () => {
                               ...prevState,
                               sixthTimer: presentTime,
                             }));
-                            setRunning(prevState => ({
-                              ...prevState,
-                              sixthTimer: true,
-                            }));
-                            setValidation({
-                              ...validation,
-                              fourthTimer: false,
-                            });
+                            setSixthRunning(true);
+                            setValidationTimer(true);
                           }}>
                           <PlayIcon
                             name="play-circle-outline"
@@ -1001,7 +1105,7 @@ const Securityy = () => {
                             color="#fff"
                             style={{alignItems: 'center'}}
                           />
-                        </TouchableOpacity>
+                        </Pressable>
                       </Text>
                     </View>
                     <View style={{padding: 3}}>
@@ -1009,44 +1113,43 @@ const Securityy = () => {
                         {beforeStart.sixthTimer}
                       </Text>
                     </View>
-                  </Text>
+                  </Text> */}
                 </View>
 
-                <View style={{}}>
+                {/* <View style={{}}>
                   <Text>
                     <View>
                       <Text>
-                        <TouchableOpacity
-                          disabled={running.sixthTimer ? false : true}
+                        <Pressable
+                          disabled={sixthRunning ? false : true}
                           onPress={() => {
-                            setRunning({
-                              ...running,
-                              sixthTimer: false,
-                            });
                             setValidation({
                               ...validation,
+                              timers: true,
+
                               sixthTimer: true,
                             });
                             setResetValidation({
                               ...resetValidation,
                               sixthTimer: false,
                             });
+                            setSixthRunning(false);
                           }}>
                           <StopIcon
                             name="stop-circle-outline"
                             size={28}
                             color="#ffff"
                           />
-                        </TouchableOpacity>
+                        </Pressable>
                       </Text>
                     </View>
                     <View style={{padding: 3}}>
                       <Text style={{fontSize: 20, color: '#fff'}}>
-                        {time.sixthTimer}
+                        {sixthTime}
                       </Text>
                     </View>
                   </Text>
-                </View>
+                </View> */}
               </View>
             </View>
           </View>
@@ -1065,7 +1168,7 @@ const Securityy = () => {
               </Text>
             </View>
             <View>
-              <TouchableOpacity
+              <Pressable
                 onPress={() => {
                   setResetValidation({
                     ...resetValidation,
@@ -1073,24 +1176,21 @@ const Securityy = () => {
                     eighthTimer: true,
                     ninthTimer: true,
                   });
-                  setTime({
-                    ...time,
-                    seventhTimer: '00:00:00',
-                    eighthTimer: '00:00:00',
-                    ninthTimer: '00:00:00',
-                  });
+
                   setBeforeStart({
                     ...beforeStart,
                     seventhTimer: '00:00:00',
                     eighthTimer: '00:00:00',
                     ninthTimer: '00:00:00',
                   });
-                  setRunning({
-                    ...running,
-                    seventhTimer: false,
-                    eighthTimer: false,
-                    ninthTimer: false,
-                  });
+
+                  setSeventhRunning(false);
+                  setEighthRunning(false);
+                  setNinthRunning(false);
+
+                  setEighthTime('00:00:00');
+                  setNinthTime('00:00:00');
+                  setSeventhTime('00:00:00');
 
                   const data = [...timeRecorded];
 
@@ -1103,7 +1203,8 @@ const Securityy = () => {
                   setTimeRecorded(data);
                   setValidation({
                     ...validation,
-                    sixthTimer: true,
+                    timers: false,
+
                     seventhTimer: false,
                     eighthTimer: false,
                     ninthTimer: false,
@@ -1119,7 +1220,7 @@ const Securityy = () => {
                     />
                   </Text>
                 </View>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
           <View style={styles.timer_background}>
@@ -1138,8 +1239,7 @@ const Securityy = () => {
                   <Text>
                     <View style={{}}>
                       <Text>
-                        <TouchableOpacity
-                          disabled={validation.sixthTimer ? false : true}
+                        <Pressable
                           onPress={() => {
                             setSelectedTimer('seventhTimer');
                             let date = new Date();
@@ -1151,14 +1251,8 @@ const Securityy = () => {
                               ...prevState,
                               seventhTimer: presentTime,
                             }));
-                            setRunning(prevState => ({
-                              ...prevState,
-                              seventhTimer: true,
-                            }));
-                            setValidation({
-                              ...validation,
-                              fifthTimer: false,
-                            });
+
+                            setSeventhRunning(true);
                           }}>
                           <PlayIcon
                             name="play-circle-outline"
@@ -1166,7 +1260,7 @@ const Securityy = () => {
                             color="#fff"
                             style={{alignItems: 'center'}}
                           />
-                        </TouchableOpacity>
+                        </Pressable>
                       </Text>
                     </View>
                     <View style={{padding: 3}}>
@@ -1181,33 +1275,33 @@ const Securityy = () => {
                   <Text>
                     <View>
                       <Text>
-                        <TouchableOpacity
-                          disabled={running.seventhTimer ? false : true}
+                        <Pressable
+                          disabled={seventhRunning ? false : true}
                           onPress={() => {
-                            setRunning({
-                              ...running,
-                              seventhTimer: false,
-                            });
                             setValidation({
                               ...validation,
+                              timers: true,
+
                               seventhTimer: true,
                             });
                             setResetValidation({
                               ...resetValidation,
                               seventhTimer: false,
                             });
+                            setSeventhRunning(false);
+                            setValidationTimer(true);
                           }}>
                           <StopIcon
                             name="stop-circle-outline"
                             size={28}
                             color="#ffff"
                           />
-                        </TouchableOpacity>
+                        </Pressable>
                       </Text>
                     </View>
                     <View style={{padding: 3}}>
                       <Text style={{fontSize: 20, color: '#fff'}}>
-                        {time.seventhTimer}
+                        {seventhTime}
                       </Text>
                     </View>
                   </Text>
@@ -1229,8 +1323,7 @@ const Securityy = () => {
                   <Text>
                     <View style={{}}>
                       <Text>
-                        <TouchableOpacity
-                          disabled={validation.seventhTimer ? false : true}
+                        <Pressable
                           onPress={() => {
                             setSelectedTimer('eighthTimer');
                             let date = new Date();
@@ -1242,14 +1335,8 @@ const Securityy = () => {
                               ...prevState,
                               eighthTimer: presentTime,
                             }));
-                            setRunning(prevState => ({
-                              ...prevState,
-                              eighthTimer: true,
-                            }));
-                            setValidation({
-                              ...validation,
-                              sixthTimer: false,
-                            });
+                            setEighthRunning(true);
+                            setValidationTimer(true);
                           }}>
                           <PlayIcon
                             name="play-circle-outline"
@@ -1257,7 +1344,7 @@ const Securityy = () => {
                             color="#fff"
                             style={{alignItems: 'center'}}
                           />
-                        </TouchableOpacity>
+                        </Pressable>
                       </Text>
                     </View>
                     <View style={{padding: 3}}>
@@ -1272,33 +1359,32 @@ const Securityy = () => {
                   <Text>
                     <View>
                       <Text>
-                        <TouchableOpacity
-                          disabled={running.eighthTimer ? false : true}
+                        <Pressable
+                          disabled={eighthRunning ? false : true}
                           onPress={() => {
-                            setRunning({
-                              ...running,
-                              eighthTimer: false,
-                            });
                             setValidation({
                               ...validation,
+                              timers: true,
                               eighthTimer: true,
                             });
                             setResetValidation({
                               ...resetValidation,
                               eighthTimer: false,
                             });
+                            setEighthRunning(false);
+                            setNinthRunning(true);
                           }}>
                           <StopIcon
                             name="stop-circle-outline"
                             size={28}
                             color="#ffff"
                           />
-                        </TouchableOpacity>
+                        </Pressable>
                       </Text>
                     </View>
                     <View style={{padding: 3}}>
                       <Text style={{fontSize: 20, color: '#fff'}}>
-                        {time.eighthTimer}
+                        {eighthTime}
                       </Text>
                     </View>
                   </Text>
@@ -1309,7 +1395,89 @@ const Securityy = () => {
               <View>
                 <Text style={styles.lines}>Frisking :</Text>
               </View>
+
               <View
+                style={{
+                  alignItems: 'center',
+                  marginHorizontal: 30,
+                  alignContent: 'center',
+                }}>
+                <View style={{}}>
+                  <Text>
+                    {
+                      <>
+                        <View style={{}}>
+                          <Text>
+                            {!ninthRunning ? (
+                              <>
+                                <Pressable
+                                  onPress={() => {
+                                    setSelectedTimer('ninthTimer');
+                                    let date = new Date();
+                                    const presentTime = date.toLocaleTimeString(
+                                      'en-US',
+                                      {hour12: false},
+                                    );
+                                    setBeforeStart(prevState => ({
+                                      ...prevState,
+                                      ninthTimer: presentTime,
+                                    }));
+
+                                    setNinthRunning(true);
+                                    setValidationTimer(true);
+                                  }}>
+                                  <PlayIcon
+                                    name="play-circle-outline"
+                                    size={28}
+                                    color="#fff"
+                                    style={{alignItems: 'center'}}
+                                  />
+                                </Pressable>
+                                <View style={{padding: 3}}>
+                                  <Text style={{fontSize: 20, color: '#fff'}}>
+                                    {ninthTime
+                                      ? ninthTime
+                                      : beforeStart.ninthTimer}
+                                  </Text>
+                                </View>
+                              </>
+                            ) : (
+                              <>
+                                <Pressable
+                                  disabled={ninthRunning ? false : true}
+                                  onPress={() => {
+                                    setValidation({
+                                      ...validation,
+                                      timers: true,
+                                      ninthTimer: true,
+                                    });
+                                    setResetValidation({
+                                      ...resetValidation,
+                                      ninthTimer: false,
+                                    });
+                                    setNinthRunning(false);
+                                  }}>
+                                  <StopIcon
+                                    name="stop-circle-outline"
+                                    size={28}
+                                    color="#ffff"
+                                  />
+                                </Pressable>
+                                <View style={{padding: 3}}>
+                                  <Text style={{fontSize: 20, color: '#fff'}}>
+                                    {ninthTime}
+                                  </Text>
+                                </View>
+                              </>
+                            )}
+                          </Text>
+                        </View>
+                      </>
+                    }
+                  </Text>
+                </View>
+              </View>
+              {/* <View
                 style={{
                   display: 'flex',
                   flexDirection: 'row',
@@ -1320,8 +1488,7 @@ const Securityy = () => {
                   <Text>
                     <View style={{}}>
                       <Text>
-                        <TouchableOpacity
-                          disabled={validation.eighthTimer ? false : true}
+                        <Pressable
                           onPress={() => {
                             setSelectedTimer('ninthTimer');
                             let date = new Date();
@@ -1333,14 +1500,9 @@ const Securityy = () => {
                               ...prevState,
                               ninthTimer: presentTime,
                             }));
-                            setRunning(prevState => ({
-                              ...prevState,
-                              ninthTimer: true,
-                            }));
-                            setValidation({
-                              ...validation,
-                              seventhTimer: false,
-                            });
+
+                            setNinthRunning(true);
+                            setValidationTimer(true);
                           }}>
                           <PlayIcon
                             name="play-circle-outline"
@@ -1348,7 +1510,7 @@ const Securityy = () => {
                             color="#fff"
                             style={{alignItems: 'center'}}
                           />
-                        </TouchableOpacity>
+                        </Pressable>
                       </Text>
                     </View>
                     <View style={{padding: 3}}>
@@ -1363,56 +1525,75 @@ const Securityy = () => {
                   <Text>
                     <View>
                       <Text>
-                        <TouchableOpacity
-                          disabled={running.ninthTimer ? false : true}
+                        <Pressable
+                          disabled={ninthRunning ? false : true}
                           onPress={() => {
-                            setRunning({
-                              ...running,
-                              ninthTimer: false,
-                            });
                             setValidation({
                               ...validation,
+                              timers: true,
                               ninthTimer: true,
                             });
                             setResetValidation({
                               ...resetValidation,
                               ninthTimer: false,
                             });
+                            setNinthRunning(false);
                           }}>
                           <StopIcon
                             name="stop-circle-outline"
                             size={28}
                             color="#ffff"
                           />
-                        </TouchableOpacity>
+                        </Pressable>
                       </Text>
                     </View>
                     <View style={{padding: 3}}>
                       <Text style={{fontSize: 20, color: '#fff'}}>
-                        {time.ninthTimer}
+                        {ninthTime}
                       </Text>
                     </View>
                   </Text>
                 </View>
-              </View>
+              </View> */}
             </View>
           </View>
         </View>
 
         <View style={{alignItems: 'center'}}>
-          <TouchableOpacity
+          <Pressable
             style={{
               ...styles.submitButton,
-              backgroundColor: validation.ninthTimer ? '#EA8B5B' : 'grey',
+              backgroundColor:
+                validationTimer && validation.timers
+                  ? // validation.ninthTimer &&
+                    // validation.firstTimer &&
+                    // validation.secondTimer &&
+                    // validation.thirdTimer &&
+                    // validation.fourthTimer &&
+                    // validation.fifthTimer &&
+                    // validation.seventhTimer &&
+                    // validation.eighthTimer &&
+                    // validation.sixthTimer &&
+                    // !resetValidation.firstReset &&
+                    // !resetValidation.secondReset &&
+                    // !resetValidation.thirdReset &&
+                    // !resetValidation.fourthReset &&
+                    // !resetValidation.fifthReset &&
+                    // !resetValidation.sixthTimer &&
+                    // !resetValidation.seventhTimer &&
+                    // !resetValidation.eighthTimer &&
+                    // !resetValidation.ninthTimer
+                    '#EA8B5B'
+                  : 'grey',
             }}
             onPress={handleSubmit}>
             <Text style={styles.buttonText}>Submit</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
         <View style={{alignItems: 'center'}}>
-          <TouchableOpacity style={styles.BackButton} onPress={backButton}>
+          <Pressable style={styles.BackButton} onPress={backButton}>
             <Text style={styles.buttonText}>Back</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </ScrollView>
     </View>

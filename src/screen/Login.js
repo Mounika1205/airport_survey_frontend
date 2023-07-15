@@ -3,6 +3,7 @@ import React, {useContext, useState} from 'react';
 import {
   
   Alert,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -47,8 +48,7 @@ const Login = () => {
        const response = await login(loginDetails);
       console.log(data, 'dataa');
       console.log('Response---->', response);
-      console.log('Response---->', response.data);
-      Alert.alert('Logged in Successfully')
+       Alert.alert('Logged in Successfully')
 
     } catch (e) {
       console.log('error--------->', e);
@@ -93,9 +93,9 @@ const Login = () => {
           />
         </View>
         {checkValidEmail ? (
-          <Text style={styles.textFailed}>*Text should not be empty</Text>
+          <Text style={styles.textFailed}>*Please enter the Email </Text>
         ) : (
-          ''
+          null
         )}
         <View style={styles.inputBox}>
           <TextInput
@@ -107,18 +107,17 @@ const Login = () => {
           />
         </View>
         {checkValidPassword ? (
-          <Text style={styles.textFailed}>*Text should not be empty</Text>
+          <Text style={styles.textFailed}>*Please enter the password</Text>
         ) : (
-          ''
+          null
         )}
 
-        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+        <Pressable style={styles.button} onPress={handleSubmit}>
           <Text style={styles.text}>Sign in</Text>
-        </TouchableOpacity>
-        {/* )} */}
-        <TouchableOpacity style={styles.buttonBack}>
+        </Pressable>
+        <Pressable style={styles.buttonBack}>
           <Text style={styles.text}>Go Back</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </ScrollView>
   );

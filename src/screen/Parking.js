@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ScrollView,
   Alert,
+  Pressable,
 } from 'react-native';
 import React, {useContext, useEffect, useState} from 'react';
 import ResetIcon from 'react-native-vector-icons/AntDesign';
@@ -33,20 +34,20 @@ const Parking = () => {
     {label: 'Arrival', value: '1'},
     {label: 'Departure', value: '2'},
   ];
-  const [time, setTime] = useState({
-    firstTimer: '00:00:00',
-    secondTimer: '00:00:00',
-    thirdTimer: '00:00:00',
-    fourthTimer: '00:00:00',
-    fifthTimer: '00:00:00',
-  });
-  const [running, setRunning] = useState({
-    firstTimer: false,
-    secondTimer: false,
-    thirdTimer: false,
-    fourthTimer: false,
-    fifthTimer: false,
-  });
+  const [firstRunning, setFirstRunning] = useState(false);
+  const [firstTime, setFirstTime] = useState('00:00:00');
+
+  const [secondRunning, setSecondRunning] = useState(false);
+  const [secondTime, setSecondTime] = useState('00:00:00');
+
+  const [thirdRunning, setThirdRunning] = useState(false);
+  const [thirdTime, setThirdTime] = useState('00:00:00');
+
+  const [fourthRunning, setFourthRunning] = useState(false);
+  const [fourthTime, setFourthTime] = useState('00:00:00');
+
+  const [fifthRunning, setFifthRunning] = useState(false);
+  const [fifthTime, setFifthTime] = useState('00:00:00');
 
   const [beforeStart, setBeforeStart] = useState({
     firstTimer: '00:00:00',
@@ -57,10 +58,7 @@ const Parking = () => {
   });
 
   const [selectedTimer, setSelectedTimer] = useState('');
-
-  const [counter, SetCounter] = useState('');
-
-  const [mannedValue, setMannedValue] = useState('');
+  const [validationTimer, setValidationTimer] = useState(false);
 
   const [millisec, setMilliSec] = useState({
     firstTimer: '00:00:00.0',
@@ -134,128 +132,184 @@ const Parking = () => {
   useEffect(() => {
     let interval;
 
-    if (running[selectedTimer]) {
+    if (firstRunning) {
       interval = setInterval(() => {
         const presentTime = new Date().toLocaleTimeString('en-US', {
           hour12: false,
         });
-        console.log(presentTime, 'iam present time');
-        setTime({
-          ...time,
-          [selectedTimer]: presentTime,
-        });
-        const currentTime =
-          new Date().toLocaleTimeString() + `.${new Date().getMilliseconds()}`;
-        console.log(currentTime, 'iam current time');
-        setMilliSec(prevState => ({
-          ...millisec,
-          [selectedTimer]: currentTime,
-        }));
+
+        setFirstTime(presentTime);
       }, 1000);
-      console.log(time, 'gjadg');
-    } else if (!running[selectedTimer]) {
-      console.log('iammmmmmmmmmmmmmm');
+    } else if (!firstRunning) {
       clearInterval(interval);
       setTimeRecorded(prevState => ({
         ...prevState,
         passenger1: {
           ...prevState.passenger1,
           start_time: beforeStart.firstTimer,
-          end_time: millisec.firstTimer,
-        },
-        passenger2: {
-          ...prevState.passenger2,
-          start_time: beforeStart.secondTimer,
-          end_time: millisec.secondTimer,
-        },
-        passenger3: {
-          ...prevState.passenger3,
-          start_time: beforeStart.thirdTimer,
-          end_time: millisec.thirdTimer,
-        },
-        passenger4: {
-          ...prevState.passenger4,
-          start_time: beforeStart.fourthTimer,
-          end_time: millisec.fourthTimer,
-        },
-        passenger5: {
-          ...prevState.passenger5,
-          start_time: beforeStart.fifthTimer,
-          end_time: millisec.fifthTimer,
+          end_time: firstTime,
         },
       }));
     }
-
     return () => {
       clearInterval(interval);
     };
-  }, [
-    running.firstTimer,
-    running.secondTimer,
-    running.thirdTimer,
-    running.fourthTimer,
-    running.fifthTimer,
-  ]);
-  console.log(time, 'iam time obj');
-  console.log(beforeStart);
+  }, [firstRunning]);
+
+  useEffect(() => {
+    let interval;
+
+    if (secondRunning) {
+      interval = setInterval(() => {
+        const presentTime = new Date().toLocaleTimeString('en-US', {
+          hour12: false,
+        });
+
+        setSecondTime(presentTime);
+      }, 1000);
+    } else if (!secondRunning) {
+      clearInterval(interval);
+      setTimeRecorded(prevState => ({
+        ...prevState,
+        passenger2: {
+          ...prevState.passenger2,
+          start_time: beforeStart.secondTimer,
+          end_time: secondTime,
+        },
+      }));
+    }
+    return () => {
+      clearInterval(interval);
+    };
+  }, [secondRunning]);
+
+  useEffect(() => {
+    let interval;
+
+    if (thirdRunning) {
+      interval = setInterval(() => {
+        const presentTime = new Date().toLocaleTimeString('en-US', {
+          hour12: false,
+        });
+
+        setThirdTime(presentTime);
+      }, 1000);
+    } else if (!thirdRunning) {
+      clearInterval(interval);
+      setTimeRecorded(prevState => ({
+        ...prevState,
+        passenger3: {
+          ...prevState.passenger3,
+          start_time: beforeStart.thirdTimer,
+          end_time: thirdTime,
+        },
+      }));
+    }
+    return () => {
+      clearInterval(interval);
+    };
+  }, [thirdRunning]);
+
+  useEffect(() => {
+    let interval;
+
+    if (fourthRunning) {
+      interval = setInterval(() => {
+        const presentTime = new Date().toLocaleTimeString('en-US', {
+          hour12: false,
+        });
+
+        setFourthTime(presentTime);
+      }, 1000);
+    } else if (!fourthRunning) {
+      clearInterval(interval);
+      setTimeRecorded(prevState => ({
+        ...prevState,
+        passenger4: {
+          ...prevState.passenger4,
+          start_time: beforeStart.fourthTimer,
+          end_time: fourthTime,
+        },
+      }));
+    }
+    return () => {
+      clearInterval(interval);
+    };
+  }, [fourthRunning]);
+
+  useEffect(() => {
+    let interval;
+
+    if (fifthRunning) {
+      interval = setInterval(() => {
+        const presentTime = new Date().toLocaleTimeString('en-US', {
+          hour12: false,
+        });
+
+        setFifthTime(presentTime);
+      }, 1000);
+    } else if (!fifthRunning) {
+      clearInterval(interval);
+      setTimeRecorded(prevState => ({
+        ...prevState,
+        passenger5: {
+          ...prevState.passenger5,
+          start_time: beforeStart.fifthTimer,
+          end_time: fifthTime,
+        },
+      }));
+    }
+    return () => {
+      clearInterval(interval);
+    };
+  }, [fifthRunning]);
 
   const handleSubmit = async () => {
+    if (type != '' && validationTimer && validation.timer) {
+      const final = {
+        airport_name: route.params.airportName,
+        terminal: route.params.terminal,
+        area: route.params.areaName,
+        meta_data: {
+          type: typeName,
+        },
+        time_recorded: timeRecorded,
+      };
+      console.log(final, 'iam api object');
 
-    if(validation.fifthPassenger &&
-      type != '' &&
-      !resetValidation.firstReset &&
-      !resetValidation.secondReset &&
-      !resetValidation.thirdReset &&
-      !resetValidation.fourthReset &&
-      !resetValidation.fifthReset){
+      // Alert.alert('api suceesss');
 
-        
-    const final = {
-      airport_name: route.params.airportName,
-      terminal: route.params.terminal,
-      area: route.params.areaName,
-      meta_data: {
-        Type: typeName,
-      },
-      time_recorded: timeRecorded,
-    };
-    console.log(final, 'iam api object');
+      const result = await postQueueData(token, final);
 
-        const result = await postQueueData(token, final);
-
-    if (result.status === 200) {
-      Alert.alert(
-        'Success',
-        'Data is created Successfully',
-        [
-          {
-            text: 'OK',
-            onPress: () => navigation.navigate('Airport'),
-          },
-          console.log(terminal, airportValue),
-        ],
-        {cancelable: false},
-      );
-    } else {
-      Alert.alert(
-        'Error',
-        'Data is not created Successfully',
-        [
-          {
-            text: 'OK',
-            onPress: () => navigation.navigate('PARKING'),
-          },
-        ],
-        {cancelable: false},
-      );
-    }
-
+      if (result.status === 200) {
+        Alert.alert(
+          'Success',
+          'Data is created Successfully',
+          [
+            {
+              text: 'OK',
+              onPress: () => navigation.navigate('Airport'),
+            },
+            console.log(terminal, airportValue),
+          ],
+          {cancelable: false},
+        );
       } else {
-
-        Alert.alert('Please Fill or Enter all the details')
+        Alert.alert(
+          'Error',
+          'Data is not created Successfully',
+          [
+            {
+              text: 'OK',
+              onPress: () => navigation.navigate('PARKING'),
+            },
+          ],
+          {cancelable: false},
+        );
       }
-
- 
+    } else {
+      Alert.alert('Please Fill or Enter all the details');
+    }
   };
 
   const backButton = () => {
@@ -297,7 +351,22 @@ const Parking = () => {
           />
         </Text>
         <View>
-          <TouchableOpacity
+          <Pressable
+            disabled={
+              type === '' ||
+              firstRunning ||
+              secondRunning ||
+              thirdRunning ||
+              fourthRunning ||
+              fifthRunning 
+              // validation.fifthPassenger ||
+              // validation.firstPassenger ||
+              // validation.secondPassenger ||
+              // validation.thirdPassenger ||
+              // validation.fourthPassenger
+                ? true
+                : false
+            }
             onPress={() => {
               setType('');
             }}>
@@ -306,7 +375,7 @@ const Parking = () => {
                 <ResetIcon name="retweet" size={25} color="#000" style={{}} />
               </Text>
             </View>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
       <ScrollView>
@@ -324,24 +393,20 @@ const Parking = () => {
             </View>
 
             <View>
-              <TouchableOpacity
+              <Pressable
                 onPress={() => {
-                  setResetValidation({
-                    ...resetValidation,
-                    firstReset: true,
-                  });
-                  setTime({
-                    ...time,
-                    firstTimer: '00:00:00',
-                  });
+                  // setResetValidation({
+                  //   ...resetValidation,
+                  //   firstReset: true,
+                  // });
+
                   setBeforeStart({
                     ...beforeStart,
                     firstTimer: '00:00:00',
                   });
-                  setRunning({
-                    ...running,
-                    firstTimer: false,
-                  });
+                  setFirstRunning(false);
+                  setValidationTimer(false);
+                  setFirstTime('00:00:00');
                   setValidation({
                     ...validation,
                     firstPassenger: false,
@@ -370,7 +435,7 @@ const Parking = () => {
                     />
                   </Text>
                 </View>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
           <View style={styles.timer_background}>
@@ -378,10 +443,8 @@ const Parking = () => {
               <Text>
                 <View style={{}}>
                   <Text>
-                    <TouchableOpacity
-                      disabled={
-                        typeName === '' || validation.timer ? true : false
-                      }
+                    <Pressable
+                      disabled={type === '' ? true : false}
                       onPress={() => {
                         setSelectedTimer('firstTimer');
                         let date = new Date();
@@ -392,10 +455,12 @@ const Parking = () => {
                           ...prevState,
                           firstTimer: presentTime,
                         }));
-                        setRunning(prevState => ({
-                          ...prevState,
-                          firstTimer: true,
-                        }));
+                        // setValidation({
+                        //   ...validation,
+                        //   timer: true,
+                        // });
+                        setFirstRunning(true);
+                        setValidationTimer(true);
                       }}>
                       <PlayIcon
                         name="play-circle-outline"
@@ -403,7 +468,7 @@ const Parking = () => {
                         color="#fff"
                         style={{alignItems: 'center'}}
                       />
-                    </TouchableOpacity>
+                    </Pressable>
                   </Text>
                 </View>
                 <View style={{padding: 3}}>
@@ -418,33 +483,31 @@ const Parking = () => {
               <Text>
                 <View>
                   <Text>
-                    <TouchableOpacity
-                      disabled={running.firstTimer ? false : true}
+                    <Pressable
+                      disabled={firstRunning ? false : true}
                       onPress={() => {
-                        setRunning({
-                          ...running,
-                          firstTimer: false,
-                        });
                         setValidation({
                           ...validation,
+                          timer: true,
                           firstPassenger: true,
                         });
                         setResetValidation({
                           ...resetValidation,
                           firstReset: false,
                         });
+                        setFirstRunning(false);
                       }}>
                       <StopIcon
                         name="stop-circle-outline"
                         size={28}
                         color="#ffff"
                       />
-                    </TouchableOpacity>
+                    </Pressable>
                   </Text>
                 </View>
                 <View style={{padding: 3}}>
                   <Text style={{fontSize: 20, color: '#fff'}}>
-                    {time.firstTimer}
+                    {firstTime}{' '}
                   </Text>
                 </View>
               </Text>
@@ -466,26 +529,24 @@ const Parking = () => {
             </View>
 
             <View>
-              <TouchableOpacity
+              <Pressable
                 onPress={() => {
-                  setResetValidation({
-                    ...resetValidation,
-                    secondReset: true,
-                  });
-                  setTime({
-                    ...time,
-                    secondTimer: '00:00:00',
-                  });
+                  // setResetValidation({
+                  //   ...resetValidation,
+                  //   secondReset: true,
+                  // });
+
                   setBeforeStart({
                     ...beforeStart,
                     secondTimer: '00:00:00',
                   });
-                  setRunning({
-                    ...running,
-                    secondTimer: false,
-                  });
+                  setSecondRunning(false);
+                  setValidationTimer(false);
+
+                  setSecondTime('00:00:00');
                   setValidation({
                     ...validation,
+                    timer: false,
                     firstPassenger: true,
                   });
                   setTimeRecorded(prevState => ({
@@ -511,7 +572,7 @@ const Parking = () => {
                     />
                   </Text>
                 </View>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
           <View style={styles.timer_background}>
@@ -519,8 +580,8 @@ const Parking = () => {
               <Text>
                 <View style={{}}>
                   <Text>
-                    <TouchableOpacity
-                      disabled={validation.firstPassenger ? false : true}
+                    <Pressable
+                      disabled={type === '' ? true : false}
                       onPress={() => {
                         setSelectedTimer('secondTimer');
                         let date = new Date();
@@ -531,14 +592,9 @@ const Parking = () => {
                           ...prevState,
                           secondTimer: presentTime,
                         }));
-                        setRunning(prevState => ({
-                          ...prevState,
-                          secondTimer: true,
-                        }));
-                        setValidation({
-                          ...validation,
-                          timer: true,
-                        });
+
+                        setSecondRunning(true);
+                        setValidationTimer(true);
                       }}>
                       <PlayIcon
                         name="play-circle-outline"
@@ -546,7 +602,7 @@ const Parking = () => {
                         color="#fff"
                         style={{alignItems: 'center'}}
                       />
-                    </TouchableOpacity>
+                    </Pressable>
                   </Text>
                 </View>
                 <View style={{padding: 3}}>
@@ -561,33 +617,31 @@ const Parking = () => {
               <Text>
                 <View>
                   <Text>
-                    <TouchableOpacity
-                      disabled={running.secondTimer ? false : true}
+                    <Pressable
+                      disabled={secondRunning ? false : true}
                       onPress={() => {
-                        setRunning({
-                          ...running,
-                          secondTimer: false,
-                        });
                         setValidation({
                           ...validation,
+                          timer: true,
                           secondPassenger: true,
                         });
                         setResetValidation({
                           ...resetValidation,
                           secondReset: false,
                         });
+                        setSecondRunning(false);
                       }}>
                       <StopIcon
                         name="stop-circle-outline"
                         size={28}
                         color="#ffff"
                       />
-                    </TouchableOpacity>
+                    </Pressable>
                   </Text>
                 </View>
                 <View style={{padding: 3}}>
                   <Text style={{fontSize: 20, color: '#fff'}}>
-                    {time.secondTimer}
+                    {secondTime}{' '}
                   </Text>
                 </View>
               </Text>
@@ -609,28 +663,27 @@ const Parking = () => {
             </View>
 
             <View>
-              <TouchableOpacity
+              <Pressable
                 onPress={() => {
-                  setResetValidation({
-                    ...resetValidation,
-                    thirdReset: true,
-                  });
-                  setTime({
-                    ...time,
-                    thirdTimer: '00:00:00',
-                  });
+                  // setResetValidation({
+                  //   ...resetValidation,
+                  //   thirdReset: true,
+                  // });
+
                   setBeforeStart({
                     ...beforeStart,
                     thirdTimer: '00:00:00',
                   });
-                  setRunning({
-                    ...running,
-                    thirdTimer: false,
-                  });
+                  setThirdRunning(false);
+                  setValidationTimer(false);
+
+                  setThirdTime('00:00:00');
                   setValidation({
                     ...validation,
+                    timer: false,
                     secondPassenger: true,
                   });
+
                   setTimeRecorded(prevState => ({
                     ...prevState,
                     passenger3: {
@@ -654,7 +707,7 @@ const Parking = () => {
                     />
                   </Text>
                 </View>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
           <View style={styles.timer_background}>
@@ -662,8 +715,8 @@ const Parking = () => {
               <Text>
                 <View style={{}}>
                   <Text>
-                    <TouchableOpacity
-                      disabled={validation.secondPassenger ? false : true}
+                    <Pressable
+                      disabled={type === '' ? true : false}
                       onPress={() => {
                         setSelectedTimer('thirdTimer');
                         let date = new Date();
@@ -674,14 +727,8 @@ const Parking = () => {
                           ...prevState,
                           thirdTimer: presentTime,
                         }));
-                        setRunning(prevState => ({
-                          ...prevState,
-                          thirdTimer: true,
-                        }));
-                        setValidation({
-                          ...validation,
-                          firstPassenger: false,
-                        });
+                        setThirdRunning(true);
+                        setValidationTimer(true);
                       }}>
                       <PlayIcon
                         name="play-circle-outline"
@@ -689,7 +736,7 @@ const Parking = () => {
                         color="#fff"
                         style={{alignItems: 'center'}}
                       />
-                    </TouchableOpacity>
+                    </Pressable>
                   </Text>
                 </View>
                 <View style={{padding: 3}}>
@@ -704,15 +751,13 @@ const Parking = () => {
               <Text>
                 <View>
                   <Text>
-                    <TouchableOpacity
-                      disabled={running.thirdTimer ? false : true}
+                    <Pressable
+                      disabled={thirdRunning ? false : true}
                       onPress={() => {
-                        setRunning({
-                          ...running,
-                          thirdTimer: false,
-                        });
+                        setThirdRunning(false);
                         setValidation({
                           ...validation,
+                          timer: true,
                           thirdPassenger: true,
                         });
                         setResetValidation({
@@ -725,13 +770,11 @@ const Parking = () => {
                         size={28}
                         color="#ffff"
                       />
-                    </TouchableOpacity>
+                    </Pressable>
                   </Text>
                 </View>
                 <View style={{padding: 3}}>
-                  <Text style={{fontSize: 20, color: '#fff'}}>
-                    {time.thirdTimer}
-                  </Text>
+                  <Text style={{fontSize: 20, color: '#fff'}}>{thirdTime}</Text>
                 </View>
               </Text>
             </View>
@@ -752,26 +795,25 @@ const Parking = () => {
             </View>
 
             <View>
-              <TouchableOpacity
+              <Pressable
                 onPress={() => {
-                  setResetValidation({
-                    ...resetValidation,
-                    fourthReset: true,
-                  });
-                  setTime({
-                    ...time,
-                    fourthTimer: '00:00:00',
-                  });
+                  // setResetValidation({
+                  //   ...resetValidation,
+                  //   fourthReset: true,
+                  // });
+
                   setBeforeStart({
                     ...beforeStart,
                     fourthTimer: '00:00:00',
                   });
-                  setRunning({
-                    ...running,
-                    fourthTimer: false,
-                  });
+                  setFourthRunning(false);
+                  setValidationTimer(false);
+
+                  setFourthTime('00:00:00');
                   setValidation({
                     ...validation,
+                    timer: false,
+
                     thirdPassenger: true,
                   });
                   setTimeRecorded(prevState => ({
@@ -797,7 +839,7 @@ const Parking = () => {
                     />
                   </Text>
                 </View>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
           <View style={styles.timer_background}>
@@ -805,8 +847,8 @@ const Parking = () => {
               <Text>
                 <View style={{}}>
                   <Text>
-                    <TouchableOpacity
-                      disabled={validation.thirdPassenger ? false : true}
+                    <Pressable
+                      disabled={type === '' ? true : false}
                       onPress={() => {
                         setSelectedTimer('fourthTimer');
                         let date = new Date();
@@ -817,14 +859,8 @@ const Parking = () => {
                           ...prevState,
                           fourthTimer: presentTime,
                         }));
-                        setRunning(prevState => ({
-                          ...prevState,
-                          fourthTimer: true,
-                        }));
-                        setValidation({
-                          ...validation,
-                          secondPassenger: false,
-                        });
+                        setFourthRunning(true);
+                        setValidationTimer(true);
                       }}>
                       <PlayIcon
                         name="play-circle-outline"
@@ -832,7 +868,7 @@ const Parking = () => {
                         color="#fff"
                         style={{alignItems: 'center'}}
                       />
-                    </TouchableOpacity>
+                    </Pressable>
                   </Text>
                 </View>
                 <View style={{padding: 3}}>
@@ -847,15 +883,13 @@ const Parking = () => {
               <Text>
                 <View>
                   <Text>
-                    <TouchableOpacity
-                      disabled={running.fourthTimer ? false : true}
+                    <Pressable
+                      disabled={fourthRunning ? false : true}
                       onPress={() => {
-                        setRunning({
-                          ...running,
-                          fourthTimer: false,
-                        });
+                        setFourthRunning(false);
                         setValidation({
                           ...validation,
+                          timer: true,
                           fourthPassenger: true,
                         });
                         setResetValidation({
@@ -868,12 +902,12 @@ const Parking = () => {
                         size={28}
                         color="#ffff"
                       />
-                    </TouchableOpacity>
+                    </Pressable>
                   </Text>
                 </View>
                 <View style={{padding: 3}}>
                   <Text style={{fontSize: 20, color: '#fff'}}>
-                    {time.fourthTimer}
+                    {fourthTime}
                   </Text>
                 </View>
               </Text>
@@ -895,26 +929,26 @@ const Parking = () => {
             </View>
 
             <View>
-              <TouchableOpacity
+              <Pressable
                 onPress={() => {
-                  setResetValidation({
-                    ...resetValidation,
-                    fifthReset: true,
-                  });
-                  setTime({
-                    ...time,
-                    fifthTimer: '00:00:00',
-                  });
+                  // setResetValidation({
+                  //   ...resetValidation,
+                  //   fifthReset: true,
+                  // });
+
                   setBeforeStart({
                     ...beforeStart,
                     fifthTimer: '00:00:00',
                   });
-                  setRunning({
-                    ...running,
-                    fifthTimer: false,
-                  });
+
+                  setFifthRunning(false);
+                  setValidationTimer(false);
+
+                  setFifthTime('00:00:00');
                   setValidation({
                     ...validation,
+                    timer: false,
+
                     fourthPassenger: true,
                     fifthPassenger: false,
                   });
@@ -941,7 +975,7 @@ const Parking = () => {
                     />
                   </Text>
                 </View>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
           <View style={styles.timer_background}>
@@ -949,8 +983,8 @@ const Parking = () => {
               <Text>
                 <View style={{}}>
                   <Text>
-                    <TouchableOpacity
-                      disabled={validation.fourthPassenger ? false : true}
+                    <Pressable
+                      disabled={type === '' ? true : false}
                       onPress={() => {
                         setSelectedTimer('fifthTimer');
                         let date = new Date();
@@ -961,14 +995,9 @@ const Parking = () => {
                           ...prevState,
                           fifthTimer: presentTime,
                         }));
-                        setRunning(prevState => ({
-                          ...prevState,
-                          fifthTimer: true,
-                        }));
-                        setValidation({
-                          ...validation,
-                          thirdPassenger: false,
-                        });
+
+                        setFifthRunning(true);
+                        setValidationTimer(true);
                       }}>
                       <PlayIcon
                         name="play-circle-outline"
@@ -976,7 +1005,7 @@ const Parking = () => {
                         color="#fff"
                         style={{alignItems: 'center'}}
                       />
-                    </TouchableOpacity>
+                    </Pressable>
                   </Text>
                 </View>
                 <View style={{padding: 3}}>
@@ -991,15 +1020,14 @@ const Parking = () => {
               <Text>
                 <View>
                   <Text>
-                    <TouchableOpacity
-                      disabled={running.fifthTimer ? false : true}
+                    <Pressable
+                      disabled={fifthRunning ? false : true}
                       onPress={() => {
-                        setRunning({
-                          ...running,
-                          fifthTimer: false,
-                        });
+                        setFifthRunning(false);
+
                         setValidation({
                           ...validation,
+                          timer: true,
                           fifthPassenger: true,
                         });
                         setResetValidation({
@@ -1012,13 +1040,11 @@ const Parking = () => {
                         size={28}
                         color="#ffff"
                       />
-                    </TouchableOpacity>
+                    </Pressable>
                   </Text>
                 </View>
                 <View style={{padding: 3}}>
-                  <Text style={{fontSize: 20, color: '#fff'}}>
-                    {time.fifthTimer}
-                  </Text>
+                  <Text style={{fontSize: 20, color: '#fff'}}>{fifthTime}</Text>
                 </View>
               </Text>
             </View>
@@ -1026,39 +1052,20 @@ const Parking = () => {
         </View>
 
         <View style={{alignItems: 'center'}}>
-          <TouchableOpacity
-            // disabled={
-            //   validation.fifthPassenger &&
-            //   type != '' &&
-            //   !resetValidation.firstReset &&
-            //   !resetValidation.secondReset &&
-            //   !resetValidation.thirdReset &&
-            //   !resetValidation.fourthReset &&
-            //   !resetValidation.fifthReset
-            //     ? false
-            //     : true
-            // }
+          <Pressable
             style={{
               ...styles.submitButton,
               backgroundColor:
-                validation.fifthPassenger &&
-                type != '' &&
-                !resetValidation.firstReset &&
-                !resetValidation.secondReset &&
-                !resetValidation.thirdReset &&
-                !resetValidation.fourthReset &&
-                !resetValidation.fifthReset
-                  ? '#EA8B5B'
-                  : 'grey',
+                validationTimer && validation.timer ? '#EA8B5B' : 'grey',
             }}
             onPress={handleSubmit}>
             <Text style={styles.buttonText}>Submit</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
         <View style={{alignItems: 'center'}}>
-          <TouchableOpacity style={styles.BackButton} onPress={backButton}>
+          <Pressable style={styles.BackButton} onPress={backButton}>
             <Text style={styles.buttonText}>Back</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </ScrollView>
     </View>

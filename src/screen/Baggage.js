@@ -4,10 +4,10 @@ import {
   StyleSheet,
   ScrollView,
   Dimensions,
-  TouchableOpacity,
+  Pressable,
   Alert,
   TextInput,
-  Pressable,
+  // Pressable,
 } from 'react-native';
 import React, {useState, useEffect, useContext} from 'react';
 import ResetIcon from 'react-native-vector-icons/AntDesign';
@@ -25,7 +25,8 @@ const Baggage = () => {
 
   const {token} = useContext(AuthContext);
 
-  const [text, onChangeText] = useState('');
+  const airportValue = route.params.airportName;
+  const terminal = route.params.terminal;
 
   const [flightNo, setFlightNo] = useState({
     firstFlight: '',
@@ -59,8 +60,8 @@ const Baggage = () => {
   });
 
   const [selectedTimer, setSelectedTimer] = useState('');
+  const [validationTimer, setValidationTimer] = useState(false);
 
-  const [submit, setSubmit] = useState(false);
 
   const [millisec, setMilliSec] = useState({
     firstTimer: '00:00:00.0',
@@ -126,6 +127,7 @@ const Baggage = () => {
       last_bag: '00:00:00.0',
     },
   });
+
   useEffect(() => {
     setTimeRecorded(prevState => ({
       ...prevState,
@@ -166,16 +168,32 @@ const Baggage = () => {
     running.thirdTimer,
     running.fourthTimer,
     running.fifthTimer,
+    flightNo.fifthFlight,
+    flightNo.secondFlight,
+    flightNo.thirdFlight,
+    flightNo.fourthFlight,
+    flightNo.fifthFlight,
   ]);
 
   const handleSubmit = async () => {
     if (
-     !validation.flight5_last_bag &&
-      !resetValidation.firstReset &&
-      !resetValidation.secondReset &&
-      !resetValidation.thirdReset &&
-      !resetValidation.fourthReset &&
-      !resetValidation.fifthReset
+      validationTimer 
+      
+      // !resetValidation.firstReset &&
+      // !resetValidation.secondReset &&
+      // !resetValidation.thirdReset &&
+      // !resetValidation.fourthReset &&
+      // !resetValidation.fifthReset &&
+      // flightNo.fifthFlight != '' &&
+      // flightNo.fourthFlight != '' &&
+      // flightNo.thirdFlight != '' &&
+      // flightNo.secondFlight != '' &&
+      // flightNo.firstFlight != '' &&
+      // !running.fifthTimer &&
+      // !running.fourthTimer &&
+      // !running.thirdTimer &&
+      // !running.secondTimer &&
+      // !running.firstTimer
     ) {
       const final = {
         airport_name: route.params.airportName,
@@ -185,6 +203,8 @@ const Baggage = () => {
         time_recorded: timeRecorded,
       };
       console.log(final, 'iam api object');
+
+      // Alert.alert('apiiiiiii')
 
       const result = await postQueueData(token, final);
 
@@ -213,12 +233,17 @@ const Baggage = () => {
           {cancelable: false},
         );
       }
-    }
-    else {
+    } else {
       Alert.alert('Please Fill or Enter all the details');
     }
   };
 
+  const backButton = () => {
+    navigation.navigate('Area', {
+      airportValue,
+      terminal,
+    });
+  };
 
   return (
     <View style={styles.contain}>
@@ -250,7 +275,7 @@ const Baggage = () => {
                 />
               </View>
               <View>
-                <TouchableOpacity
+                <Pressable
                   onPress={() => {
                     setResetValidation({
                       ...resetValidation,
@@ -276,6 +301,7 @@ const Baggage = () => {
                       ...validation,
                       flight1_first_bag: false,
                     });
+                    setValidationTimer(false)
                   }}>
                   <View>
                     <Text style={{}}>
@@ -287,7 +313,7 @@ const Baggage = () => {
                       />
                     </Text>
                   </View>
-                </TouchableOpacity>
+                </Pressable>
               </View>
             </View>
             <View
@@ -309,13 +335,7 @@ const Baggage = () => {
                     justifyContent: 'space-between',
                   }}>
                   <Text>
-                    <TouchableOpacity
-                      disabled={
-                        flightNo.firstFlight != '' &&
-                        !validation.flight1_first_bag
-                          ? false
-                          : true
-                      }
+                    <Pressable
                       onPress={() => {
                         setSelectedTimer('firstTimer');
                         let date = new Date();
@@ -338,7 +358,7 @@ const Baggage = () => {
                         color="#fff"
                         style={{margin: 4}}
                       />
-                    </TouchableOpacity>{' '}
+                    </Pressable>{' '}
                   </Text>
 
                   <Text style={{fontSize: 20, color: 'white', marginTop: 5}}>
@@ -357,12 +377,8 @@ const Baggage = () => {
                     justifyContent: 'space-between',
                   }}>
                   <Text>
-                    <TouchableOpacity
-                      disabled={
-                        running.firstTimer && !validation.flight1_last_bag
-                          ? false
-                          : true
-                      }
+                    <Pressable
+                      disabled={running.firstTimer ? false : true}
                       onPress={() => {
                         let date = new Date();
                         const presentTime = date.toLocaleTimeString('en-US', {
@@ -372,7 +388,7 @@ const Baggage = () => {
                           ...resetValidation,
                           firstFlight: false,
                         });
-
+                        setValidationTimer(true)
                         setTime({
                           ...time,
                           firstTimer: presentTime,
@@ -392,7 +408,7 @@ const Baggage = () => {
                         color="#fff"
                         style={{}}
                       />
-                    </TouchableOpacity>{' '}
+                    </Pressable>{' '}
                   </Text>
 
                   <Text style={{fontSize: 20, color: 'white', marginTop: 5}}>
@@ -423,14 +439,13 @@ const Baggage = () => {
                 }}>
                 <Text style={styles.lines}>Flight No :</Text>
                 <TextInput
-                  editable={validation.flight1_first_bag ? true : false}
                   style={styles.input}
                   value={flightNo.secondFlight}
                   onChangeText={text => updateState('secondFlight', text)}
                 />
               </View>
               <View>
-                <TouchableOpacity
+                <Pressable
                   onPress={() => {
                     setResetValidation({
                       ...resetValidation,
@@ -457,6 +472,8 @@ const Baggage = () => {
                       flight2_first_bag: false,
                       flight2_last_bag: false,
                     });
+                    setValidationTimer(false)
+
                   }}>
                   <View>
                     <Text style={{}}>
@@ -468,7 +485,7 @@ const Baggage = () => {
                       />
                     </Text>
                   </View>
-                </TouchableOpacity>
+                </Pressable>
               </View>
             </View>
             <View
@@ -490,13 +507,7 @@ const Baggage = () => {
                     justifyContent: 'space-between',
                   }}>
                   <Text>
-                    <TouchableOpacity
-                      disabled={
-                        flightNo.secondFlight != '' &&
-                        !validation.flight2_first_bag
-                          ? false
-                          : true
-                      }
+                    <Pressable
                       onPress={() => {
                         setSelectedTimer('secondTimer');
                         let date = new Date();
@@ -519,7 +530,7 @@ const Baggage = () => {
                         color="#fff"
                         style={{margin: 4}}
                       />
-                    </TouchableOpacity>{' '}
+                    </Pressable>{' '}
                   </Text>
 
                   <Text style={{fontSize: 20, color: 'white', marginTop: 5}}>
@@ -538,12 +549,8 @@ const Baggage = () => {
                     justifyContent: 'space-between',
                   }}>
                   <Text>
-                    <TouchableOpacity
-                      disabled={
-                        running.secondTimer && !validation.flight2_last_bag
-                          ? false
-                          : true
-                      }
+                    <Pressable
+                      disabled={running.secondTimer ? false : true}
                       onPress={() => {
                         let date = new Date();
                         const presentTime = date.toLocaleTimeString('en-US', {
@@ -553,6 +560,12 @@ const Baggage = () => {
                           ...resetValidation,
                           secondFlight: false,
                         });
+                        setRunning({
+                          ...running,
+                          secondTimer:false
+                        })
+                        setValidationTimer(true)
+
                         setTime({...time, secondTimer: presentTime});
                         setValidation({...validation, flight2_first_bag: true});
                       }}>
@@ -562,7 +575,7 @@ const Baggage = () => {
                         color="#fff"
                         style={{}}
                       />
-                    </TouchableOpacity>{' '}
+                    </Pressable>{' '}
                   </Text>
 
                   <Text style={{fontSize: 20, color: 'white', marginTop: 5}}>
@@ -593,14 +606,13 @@ const Baggage = () => {
                 }}>
                 <Text style={styles.lines}>Flight No</Text>
                 <TextInput
-                  editable={running.secondTimer ? true : false}
                   style={styles.input}
                   value={flightNo.thirdFlight}
                   onChangeText={text => updateState('thirdFlight', text)}
                 />
               </View>
               <View>
-                <TouchableOpacity
+                <Pressable
                   onPress={() => {
                     setResetValidation({
                       ...resetValidation,
@@ -627,6 +639,8 @@ const Baggage = () => {
                       flight3_first_bag: false,
                       flight3_last_bag: false,
                     });
+                    setValidationTimer(false)
+
                   }}>
                   <View>
                     <Text style={{}}>
@@ -638,7 +652,7 @@ const Baggage = () => {
                       />
                     </Text>
                   </View>
-                </TouchableOpacity>
+                </Pressable>
               </View>
             </View>
             <View
@@ -660,13 +674,7 @@ const Baggage = () => {
                     justifyContent: 'space-between',
                   }}>
                   <Text>
-                    <TouchableOpacity
-                      disabled={
-                        flightNo.thirdFlight != '' &&
-                        !validation.flight3_first_bag
-                          ? false
-                          : true
-                      }
+                    <Pressable
                       onPress={() => {
                         setSelectedTimer('thirdTimer');
                         let date = new Date();
@@ -689,7 +697,7 @@ const Baggage = () => {
                         color="#fff"
                         style={{margin: 4}}
                       />
-                    </TouchableOpacity>{' '}
+                    </Pressable>{' '}
                   </Text>
 
                   <Text style={{fontSize: 20, color: 'white', marginTop: 5}}>
@@ -708,12 +716,8 @@ const Baggage = () => {
                     justifyContent: 'space-between',
                   }}>
                   <Text>
-                    <TouchableOpacity
-                      disabled={
-                        running.thirdTimer && !validation.flight3_last_bag
-                          ? false
-                          : true
-                      }
+                    <Pressable
+                      disabled={running.thirdTimer ? false : true}
                       onPress={() => {
                         let date = new Date();
                         const presentTime = date.toLocaleTimeString('en-US', {
@@ -728,6 +732,12 @@ const Baggage = () => {
                           ...resetValidation,
                           thirdFlight: false,
                         });
+                        setRunning({
+                          ...running,
+                          thirdTimer:false
+                        })
+                        setValidationTimer(true)
+
                       }}>
                       <StopIcon
                         name="stop-circle-outline"
@@ -735,7 +745,7 @@ const Baggage = () => {
                         color="#fff"
                         style={{}}
                       />
-                    </TouchableOpacity>{' '}
+                    </Pressable>{' '}
                   </Text>
 
                   <Text style={{fontSize: 20, color: 'white', marginTop: 5}}>
@@ -766,14 +776,13 @@ const Baggage = () => {
                 }}>
                 <Text style={styles.lines}>Flight No :</Text>
                 <TextInput
-                  editable={running.thirdTimer ? true : false}
                   style={styles.input}
                   value={flightNo.fourthFlight}
                   onChangeText={text => updateState('fourthFlight', text)}
                 />
               </View>
               <View>
-                <TouchableOpacity
+                <Pressable
                   onPress={() => {
                     setResetValidation({
                       ...resetValidation,
@@ -800,6 +809,8 @@ const Baggage = () => {
                       flight4_first_bag: false,
                       flight4_last_bag: false,
                     });
+                    setValidationTimer(false)
+
                   }}>
                   <View>
                     <Text style={{}}>
@@ -811,7 +822,7 @@ const Baggage = () => {
                       />
                     </Text>
                   </View>
-                </TouchableOpacity>
+                </Pressable>
               </View>
             </View>
             <View
@@ -833,13 +844,7 @@ const Baggage = () => {
                     justifyContent: 'space-between',
                   }}>
                   <Text>
-                    <TouchableOpacity
-                      disabled={
-                        flightNo.fourthFlight != '' &&
-                        !validation.flight4_first_bag
-                          ? false
-                          : true
-                      }
+                    <Pressable
                       onPress={() => {
                         setSelectedTimer('fourthTimer');
                         let date = new Date();
@@ -865,7 +870,7 @@ const Baggage = () => {
                         color="#fff"
                         style={{margin: 4}}
                       />
-                    </TouchableOpacity>{' '}
+                    </Pressable>{' '}
                   </Text>
 
                   <Text style={{fontSize: 20, color: 'white', marginTop: 5}}>
@@ -884,12 +889,8 @@ const Baggage = () => {
                     justifyContent: 'space-between',
                   }}>
                   <Text>
-                    <TouchableOpacity
-                      disabled={
-                        running.fourthTimer && !validation.flight4_last_bag
-                          ? false
-                          : true
-                      }
+                    <Pressable
+                      disabled={running.fourthTimer ? false : true}
                       onPress={() => {
                         let date = new Date();
                         const presentTime = date.toLocaleTimeString('en-US', {
@@ -904,6 +905,13 @@ const Baggage = () => {
                           ...resetValidation,
                           fourthFlight: false,
                         });
+                        setRunning({
+                          ...running,
+                          fourthTimer:false
+
+                        })
+                        setValidationTimer(true)
+
                       }}>
                       <StopIcon
                         name="stop-circle-outline"
@@ -911,7 +919,7 @@ const Baggage = () => {
                         color="#fff"
                         style={{}}
                       />
-                    </TouchableOpacity>{' '}
+                    </Pressable>{' '}
                   </Text>
 
                   <Text style={{fontSize: 20, color: 'white', marginTop: 5}}>
@@ -942,14 +950,13 @@ const Baggage = () => {
                 }}>
                 <Text style={styles.lines}>Flight No :</Text>
                 <TextInput
-                  editable={running.fourthTimer ? true : false}
                   style={styles.input}
                   value={flightNo.fifthFlight}
                   onChangeText={text => updateState('fifthFlight', text)}
                 />
               </View>
               <View>
-                <TouchableOpacity
+                <Pressable
                   onPress={() => {
                     setResetValidation({
                       ...resetValidation,
@@ -974,8 +981,10 @@ const Baggage = () => {
                     setValidation({
                       ...validation,
                       flight5_first_bag: false,
-                      flight5_last_bag:false
+                      flight5_last_bag: false,
                     });
+                    setValidationTimer(false)
+
                   }}>
                   <View>
                     <Text style={{}}>
@@ -987,7 +996,7 @@ const Baggage = () => {
                       />
                     </Text>
                   </View>
-                </TouchableOpacity>
+                </Pressable>
               </View>
             </View>
             <View
@@ -1009,13 +1018,7 @@ const Baggage = () => {
                     justifyContent: 'space-between',
                   }}>
                   <Text>
-                    <TouchableOpacity
-                      disabled={
-                        flightNo.fifthFlight != '' &&
-                        !validation.flight5_first_bag
-                          ? false
-                          : true
-                      }
+                    <Pressable
                       onPress={() => {
                         setSelectedTimer('fifthTimer');
                         let date = new Date();
@@ -1042,7 +1045,7 @@ const Baggage = () => {
                         color="#fff"
                         style={{margin: 4}}
                       />
-                    </TouchableOpacity>{' '}
+                    </Pressable>{' '}
                   </Text>
 
                   <Text style={{fontSize: 20, color: 'white', marginTop: 5}}>
@@ -1061,8 +1064,8 @@ const Baggage = () => {
                     justifyContent: 'space-between',
                   }}>
                   <Text>
-                    <TouchableOpacity
-                      disabled={running.fifthTimer && !validation.flight5_last_bag ? false : true}
+                    <Pressable
+                      disabled={running.fifthTimer ? false : true}
                       onPress={() => {
                         let date = new Date();
                         const presentTime = date.toLocaleTimeString('en-US', {
@@ -1076,12 +1079,18 @@ const Baggage = () => {
                         setValidation({
                           ...validation,
                           flight5_first_bag: true,
+                          flight5_last_bag: true,
                         });
                         setResetValidation({
                           ...resetValidation,
                           fifthFlight: false,
                         });
-                        setSubmit(true);
+                        setRunning({
+                          ...running,
+                          fifthTimer:false
+                        })
+                        setValidationTimer(true)
+
                       }}>
                       <StopIcon
                         name="stop-circle-outline"
@@ -1089,7 +1098,7 @@ const Baggage = () => {
                         color="#fff"
                         style={{}}
                       />
-                    </TouchableOpacity>{' '}
+                    </Pressable>{' '}
                   </Text>
 
                   <Text style={{fontSize: 20, color: 'white', marginTop: 5}}>
@@ -1102,31 +1111,22 @@ const Baggage = () => {
         </View>
 
         <View style={{alignItems: 'center'}}>
-          <TouchableOpacity
+          <Pressable
             style={{
               ...styles.submitButton,
-              backgroundColor:  !validation.flight5_last_bag &&
-              !resetValidation.firstReset &&
-              !resetValidation.secondReset &&
-              !resetValidation.thirdReset &&
-              !resetValidation.fourthReset &&
-              !resetValidation.fifthReset ? '#EA8B5B' : 'grey',
+              backgroundColor:
+              validationTimer 
+                  ? '#EA8B5B'
+                  : 'grey',
             }}
             onPress={handleSubmit}>
-            <Text style={styles.buttonText}>Submit</Text>
-          </TouchableOpacity>
+            <Text style={{...styles.buttonText}}>Submit</Text>
+          </Pressable>
         </View>
         <View style={{alignItems: 'center'}}>
-          <TouchableOpacity
-            style={styles.BackButton}
-            onPress={() => {
-              navigation.navigate('Area', {
-                airportValue,
-                terminal,
-              });
-            }}>
+          <Pressable style={styles.BackButton} onPress={backButton}>
             <Text style={styles.buttonText}>Back</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </ScrollView>
     </View>
